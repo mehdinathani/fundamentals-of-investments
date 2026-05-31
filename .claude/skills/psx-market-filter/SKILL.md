@@ -229,3 +229,26 @@ Smaller capital → narrower universe. This is from `research.md` §7.
 
 Research: `research.md` §3 (Market Reality), §4 Layer 0 (Market Reality Filter — CRITICAL).
 Principle: "Discipline > Intelligence" — Layer 0 enforces discipline before analysis.
+
+---
+
+## Layer 1.5 — Macro Overlay (ADR-003)
+
+After Layer 0 passes a stock, the macro state is checked before proceeding to fundamental/technical analysis. Macro state is checked per ADR-003 macro-states.md.
+
+### Macro State Lookup
+
+Before each pipeline run, determine macro state from `references/macro-states.md`:
+
+**Risk-off triggers (any one → risk-off):**
+- SBP hiking rates
+- USD/PKR weakened >5% in 30 days
+- IMF program at risk or review missed
+- KSE-100 P/E > 10-yr median + 1SD
+
+**Universe adjustment by state:**
+- Risk-on → full tradable universe
+- Neutral → full tradable universe, conservative sizing
+- Risk-off → restrict to defensives (utilities, cash-rich, food) or 100% cash
+
+When risk-off, the operator-behavior and volume-spike filters tighten by 1.5× (manipulation is more likely in macro stress).

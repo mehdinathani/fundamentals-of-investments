@@ -47,6 +47,13 @@ The conductor of the PSX investment system. Every other skill is a single layer;
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
+│  STEP 0: Pre-Pipeline Checks (REGIME-SHIFT + ENTRY CAP)     │
+│  → Check: 3+ stops in 5 trading days? → halt new entries    │
+│  → Check: ≥ 2 entries this week? → queue remaining BUYs     │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
 │  STEP 1: psx-data-fetcher                                   │
 │  → raw market data + financials for full PSX universe       │
 └─────────────────────────────────────────────────────────────┘
@@ -174,7 +181,25 @@ def run_pipeline(account_balance, capital_tier="standard", mode="dry-run"):
 
     # Step 1: Fetch
     universe_raw = call_skill("psx-data-fetcher",
-                              args={"action": "daily-bundle"})
+                                     args={"action": "daily-bundle"})
+
+    # Step 1b: Check entry cap (max 2 entries per week)
+    week_entries = count_entries_this_week(trades_journal)
+    if week_entries >= 2:
+        log(f"Entry cap reached: {week_entries}/2 entries this week")
+        # Still run pipeline, but queue BUY signals
+        queue_buys_for_next_week = True
+    else:
+        queue_buys_for_next_week = False
+
+    # Step 1c: Check regime-shift (3+ stops in 5 days)
+    recent_stops = count_stops_last_5_days(trades_journal)
+    if recent_stops >= 3:
+        halt_new_entries = True
+        log(f"REGIME SHIFT DETECTED: {recent_stops} stops in 5 days — halting new entries")
+        surface_adr_suggestion("Regime shift detected — review macro thesis before resuming")
+    else:
+        halt_new_entries = False
 
     # Step 2: Layer 0 — Market filter
     tradable = []

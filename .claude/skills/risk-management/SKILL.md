@@ -89,7 +89,7 @@ Position Size (PKR) = Position Size (shares) × Entry Price
 2. Calculate price risk: `entry_price - stop_loss_price`
 3. Shares = `max_loss / price_risk`
 4. PKR invested = `shares × entry_price`
-5. Validate: PKR invested ≤ `account_balance × 0.20` (max 20% per position)
+5. Validate: PKR invested ≤ `account_balance × 0.10` (max 10% per position)
 
 ```python
 def calculate_position_size(entry_price, stop_loss_price, account_balance, risk_pct=0.05):
@@ -110,9 +110,9 @@ def calculate_position_size(entry_price, stop_loss_price, account_balance, risk_
     shares = max_loss / price_risk
     pkr_invested = shares * entry_price
 
-    # Portfolio concentration limit: max 20% in one position
-    if pkr_invested > account_balance * 0.20:
-        shares = (account_balance * 0.20) / entry_price
+    # Portfolio concentration limit: max 10% in one position
+    if pkr_invested > account_balance * 0.10:
+        shares = (account_balance * 0.10) / entry_price
         pkr_invested = shares * entry_price
 
     return int(shares), round(pkr_invested, 2), round(max_loss, 2)
@@ -187,10 +187,10 @@ def calculate_trailing_stop(entry_price, current_price, stop_pct=0.05):
 
 | Limit | Value | Rationale |
 |-------|-------|-----------|
-| Max per position | 20% of account | Diversification |
+| Max per position | 10% of account | Diversification + 30% cash reserve |
 | Max in mid-caps | 30% of account | Liquidity constraint |
 | Max concurrent positions | 5-7 stocks | Focus, manageable |
-| Cash reserve | ≥ 30% of account | Opportunity fund |
+| Cash reserve | ≥ 30% of account | Opportunity fund, capital protection |
 | Correlation check | Max 2 stocks from same sector | Sector diversification |
 
 ---
@@ -204,10 +204,10 @@ These behaviors destroy accounts. The system MUST prevent them:
 | **Emotional averaging down** | STRICTLY FORBIDDEN | Converts small losses to account killers |
 | **Moving stop-loss down** | STRICTLY FORBIDDEN | Removes capital protection |
 | **Ignoring stop-loss** | STRICTLY FORBIDDEN | Violates core survival rule |
-| **Over-concentration** | STRICTLY FORBIDDEN | >20% in one position |
+| **Over-concentration** | STRICTLY FORBIDDEN | >10% in one position |
 | **Revenge trading** | STRICTLY FORBIDDEN | Trading to recover losses |
 | **Trading without volume** | STRICTLY FORBIDDEN | See `trade-rules-engine` |
-| **Holding through earnings** | DISCOURAGED | Unknown volatility gap risk |
+| **Holding through earnings** | STRICTLY FORBIDDEN (ADR-002 D10) | Flat into earnings unless thesis documented in journal |
 
 ---
 
@@ -237,9 +237,9 @@ def pre_trade_risk_check(account_balance, entry_price, stop_price,
     calc_shares = max_loss / price_risk if price_risk > 0 else 0
     pkr_invested = planned_shares * entry_price
 
-    # 2. Check single position limit (20%)
-    if pkr_invested > account_balance * 0.20:
-        return False, "Exceeds 20% per-position limit", int(calc_shares)
+    # 2. Check single position limit (10%)
+    if pkr_invested > account_balance * 0.10:
+        return False, "Exceeds 10% per-position limit", int(calc_shares)
 
     # 3. Check total exposure (max 70% invested, 30% cash)
     total_invested = sum(p["value"] for p in current_positions)
@@ -266,8 +266,8 @@ def pre_trade_risk_check(account_balance, entry_price, stop_price,
 - [ ] Stop-loss set immediately upon entry
 - [ ] Trailing stop logic implemented (breakeven at +10%, +5% at +15%)
 - [ ] Never move stop-loss down (only trail up)
-- [ ] Max 20% per position enforced
-- [ ] Max 70% total exposure (30% cash reserve)
+- [ ] Max 10% per position enforced
+- [ ] Max 70% total exposure (30% cash reserve) — max 7 positions at 10%
 - [ ] Emotional averaging down explicitly blocked
 - [ ] All risk parameters are constants, not user-tweakable defaults
 

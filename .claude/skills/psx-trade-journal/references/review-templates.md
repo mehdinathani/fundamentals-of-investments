@@ -51,7 +51,26 @@ Sections:
 2. Strategy drift check — are we still trading per backtest assumptions?
 3. Capital-tier review — has account size changed enough to shift universe?
 4. Cost analysis — is friction (commission/slippage/CGT) eating into edge?
-5. Decisions — any rule changes proposed (each → ADR)
+5. **Q4 only: Tax-loss harvesting review** — identify unrealized losses on <12mo positions for year-end offset
+6. Decisions — any rule changes proposed (each → ADR)
+
+## Annual / Q4 Tax-Loss Harvesting (ADR-002 D12)
+
+Per ADR-002 Decision 12: annual Q4 routine to harvest losses on positions held < 12 months to offset realized gains.
+
+**Process:**
+1. Identify all open positions with unrealized losses held < 12 months.
+2. For each, compare loss amount to realized YTD gains.
+3. Harvest losses sufficient to offset gains to zero (no need to harvest more).
+4. Sequence: "cut losers fast" rule takes priority — if stop-loss already triggered, that loss counts automatically.
+5. Do NOT hold a position just for tax-loss harvesting — if the signal says sell, sell.
+
+**Checklist:**
+- [ ] All positions < 12 months reviewed for harvest opportunity
+- [ ] Realized YTD gains calculated
+- [ ] Losses harvested to offset gains (or as much as practical)
+- [ ] Harvested positions logged with exit_reason = "tax_loss_harvest"
+- [ ] Annual CGT bill estimated for year-end accounting
 
 ## YTD review (annual)
 

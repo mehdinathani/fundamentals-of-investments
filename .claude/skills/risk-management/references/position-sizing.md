@@ -21,12 +21,12 @@ Price Risk: PKR 7.50/share
 Shares = 100,000 / 7.50 = 13,333 shares
 PKR Invested = 13,333 × 150 = PKR 2,000,000
 
-⚠️ EXCEEDS 20% LIMIT (100% of account)!
-Adjusted: Max 20% = PKR 400,000
-Adjusted Shares = 400,000 / 150 = 2,666 shares
-Actual Risk = 2,666 × 7.50 = PKR 19,995 (≈1% of account)
+⚠️ EXCEEDS 10% LIMIT (100% of account)!
+Adjusted: Max 10% = PKR 200,000
+Adjusted Shares = 200,000 / 150 = 1,333 shares
+Actual Risk = 1,333 × 7.50 = PKR 9,997.50 (≈0.5% of account)
 
-This shows the 20% limit may override the 5% risk rule.
+This shows the 10% limit may override the 5% risk rule.
 ```
 
 ## Conservative vs Standard Sizing
@@ -59,8 +59,8 @@ def calculate_position(account_balance, entry_price, stop_pct=0.05,
     shares = int(max_loss / price_risk)
     pkr_invested = shares * entry_price
 
-    # Enforce 20% max per position
-    max_position = account_balance * 0.20
+    # Enforce 10% max per position (ADR-002 D4)
+    max_position = account_balance * 0.10
     if pkr_invested > max_position:
         shares = int(max_position / entry_price)
         pkr_invested = shares * entry_price

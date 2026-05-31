@@ -5,9 +5,10 @@
 > **before** any live capital is deployed in Phase 1. Each decision has
 > alternatives; this ADR records the option set and the path to commitment.
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-05-30)
 - **Date:** 2026-05-05
 - **Feature:** psx-investment-system
+- **Resolution:** All 13 decisions resolved per preferred paths. Edge defined (B+A). ADR-003 (Macro Overlay) spawned per Decision 8.
 - **Context:** Validation critique against `research.md` § 15 (Open Gaps & TODOs).
 
 <!-- Significance checklist
@@ -65,8 +66,7 @@ participants don't or can't exploit."*
 capital; time-horizon (B) is the source of net-of-CGT outperformance.
 Information edge (C) requires infrastructure that doesn't yet exist.
 
-**Action:** Architect to commit to one sentence in `research.md` §2.2 within
-1 week. Until committed, **do not deploy capital.**
+**Action:** Edge sentence committed: *"I make money on PSX by holding fundamentally strong, liquid names through multi-quarter trends (time-horizon asymmetry), while systematically avoiding manipulated and illiquid stocks via the Layer 0 filter (behavioral discipline)."*
 
 ---
 

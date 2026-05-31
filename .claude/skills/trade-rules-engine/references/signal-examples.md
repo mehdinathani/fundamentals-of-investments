@@ -95,3 +95,16 @@ Technical State:
 Signal: NO TRADE (rejected)
 Reason: Volume confirmation failed — weak conviction
 ```
+
+---
+
+## CGT Bracket Reference (filer rates)
+
+| Holding Period | CGT Rate |
+|----------------|----------|
+| < 6 months | 15% |
+| 6–12 months | 12.5% |
+| 12–24 months | 10% |
+| > 24 months | 0% |
+
+CGT-aware deferral (ADR-002 D7): profit-taking exits within 30 days of a bracket boundary may defer to the lower rate if technicals remain neutral. See `trade-rules-engine/SKILL.md` §4D.

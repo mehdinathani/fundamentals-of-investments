@@ -67,15 +67,24 @@ if ma_crossover and rsi_good:
 **Why forbidden:** Low-volume signals have high failure rates.
 **Alternative:** Always verify `volume ≥ 120% of 30-day avg`.
 
-## 7. Holding Through Earnings (Without Stop)
+## 7. Holding Through Earnings (STRICTLY FORBIDDEN — ADR-002 D10)
 
 ```python
-# ❌ RISKY
-hold_position_through_earnings_without_stop()
+# ❌ NEVER DO THIS
+hold_position_through_earnings_without_approval()
 ```
 
-**Why discouraged:** PSX earnings gaps can be 5-10% in either direction.
-**Alternative:** Either exit before earnings or tighten stop to breakeven.
+**Why forbidden:** PSX earnings gaps can exceed 20% — exceeds the system's max-loss tolerance of 5%. An earnings gap-down below stop-loss is unrecoverable.
+
+**Exception:** Holding through earnings is permitted ONLY if the thesis explicitly requires it AND is documented in the trade journal with rationale.
+
+**Action:** Flat into all earnings events unless thesis documented. Re-enter after earnings if the signal still holds.
+
+## 8. Over-Concentration in Single Macro Factor (ADR-002 D4)
+
+**Why forbidden:** PSX is macro-dominated. 7 positions all exposed to USD/PKR weakness = effective 1-position bet, not 7.
+
+**Limit:** Max 2 open positions sharing the same macro factor (USD/PKR direction, interest rates, political risk).
 
 ## Enforcement in Code
 

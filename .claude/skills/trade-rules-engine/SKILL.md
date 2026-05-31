@@ -76,6 +76,7 @@ From tradable universe, select fundamentally strong companies.
 | Earnings consistency | Positive PAT in ≥ 3 of last 4 quarters | KEEP |
 | Debt-to-Equity | < 0.6 | KEEP (lower is better) |
 | Sector momentum | Sector in top 50% by index performance | KEEP |
+| Sector bottom-quartile | Sector in bottom 25% of index performance | REJECT regardless of stock fundamentals (ADR-002 D9) |
 
 **Output**: Watchlist of 10-20 stocks
 
@@ -174,6 +175,30 @@ Full exit at +25% OR technical sell signal
 If position is open > 3 months without +10% gain → Re-evaluate fundamentals
 If position is losing for > 2 months → Check for structural issues
 ```
+
+#### 4D. CGT-Aware Exit Deferral (SOFT — ADR-002 D7)
+
+When a profit-taking exit fires (e.g., MA sell signal, RSI > 70) within **30 calendar days of the 6-month holding boundary**, and technicals remain neutral, defer exit to cross the lower CGT bracket.
+
+**CGT Brackets (filer rates):**
+| Holding | Rate |
+|---------|------|
+| < 6 months | 15% |
+| 6-12 months | 12.5% |
+| 12-24 months | 10% |
+| > 24 months | 0% |
+
+**Deferral conditions (ALL must be met):**
+1. Exit signal is profit-taking (NOT stop-loss, NOT trend-reversal)
+2. Within 30 days of 6-month holding period
+3. Technicals are neutral: RSI between 30-70, no MA crossover sell signal
+4. No macro risk-off condition (check Layer 1.5)
+
+**CGT deferral MUST NOT override:**
+- Stop-loss exits (Rule 4A — hard rule)
+- Trend-reversal exits (20-day SMA crosses below 50-day SMA)
+- RSI > 70 with MA confirmation
+- Risk-off macro state (cash preservation)
 
 ---
 

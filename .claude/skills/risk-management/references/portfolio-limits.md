@@ -4,7 +4,7 @@
 
 | Limit | Value | Enforcement |
 |-------|-------|-------------|
-| Max per position | 20% of account | HARD — reject trade |
+| Max per position | 10% of account | HARD — reject trade |
 | Max total exposure | 70% of account (30% cash) | HARD — reject trade |
 | Max mid-cap exposure | 30% of account | SOFT — warn |
 | Max concurrent positions | 5-7 stocks | SOFT — warn |
@@ -52,4 +52,4 @@ def portfolio_health(positions, account_balance):
 | > 7 positions | REJECT new buys (consolidate first) |
 | > 2 stocks in same sector | WARN (diversify) |
 | > 30% in mid-caps | WARN (liquidity risk) |
-| Any position > 20% | SELL excess (partial) |
+| Any position > 10% | SELL excess (partial) |

@@ -67,3 +67,41 @@ def rsi_signal(rsi_14, ma_crossover_signal):
 | > 70 | Any | **Warning** (overbought) |
 | < 50 | Death Cross | **Strong Sell** |
 | > 70 | Death Cross | **Strong Sell** (exit now) |
+
+## CGT-Aware Deferral Logic (ADR-002 D7)
+
+When an RSI-based exit signal fires, check if CGT deferral applies:
+
+```python
+def should_defer_for_cgt(entry_date, exit_signal_type, rsi_14, ma_signal,
+                          macro_state):
+    """
+    Returns True if exit should be deferred to cross CGT bracket.
+    """
+    # Never defer stop-loss or trend-reversal
+    if exit_signal_type in ("stop_loss", "trend_reversal"):
+        return False
+
+    # Never defer if macro is risk-off
+    if macro_state == "RISK_OFF":
+        return False
+
+    # Check if within 30 days of 6-month boundary
+    holding_days = (date.today() - entry_date).days
+    days_to_6mo = 180 - holding_days
+
+    if days_to_6mo > 30:
+        return False  # Too far from boundary
+
+    if days_to_6mo <= 0:
+        return False  # Already past 6-month bracket
+
+    # Check technicals are neutral
+    if not (30 <= rsi_14 <= 70):
+        return False  # RSI outside neutral = don't defer
+
+    if ma_signal == "SELL":
+        return False  # Trend reversal = don't defer
+
+    return True
+```
