@@ -1,6 +1,8 @@
 import type { MacroState, ScanResult, Trade, Performance, PipelineStatus } from '../types';
 
-const BASE = '/api';
+// Dev: Vite proxy handles /api -> localhost:8000
+// Production: VITE_API_URL points to the Render backend
+const BASE = import.meta.env.VITE_API_URL ?? '/api';
 
 let _auth: string | null = null;
 

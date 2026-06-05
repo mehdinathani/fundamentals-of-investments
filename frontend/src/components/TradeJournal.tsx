@@ -4,7 +4,6 @@ import { api } from '../api/client';
 import type { Trade } from '../types';
 import Modal from './Modal';
 
-const dirLabel = { LONG: 'Buy (Long)', SHORT: 'Short Sell' };
 const dirBadge = { LONG: 'text-green border-green/30 bg-green/10', SHORT: 'text-red border-red/30 bg-red/10' };
 
 export default function TradeJournal({ quickLogSymbol, onQuickLogHandled }: {
@@ -20,7 +19,7 @@ export default function TradeJournal({ quickLogSymbol, onQuickLogHandled }: {
   const symbolRef = useRef<HTMLInputElement>(null);
   const [fetchedPrice, setFetchedPrice] = useState<number | null>(null);
   const [fetching, setFetching] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     api.getTrades().then(setTrades);
@@ -64,7 +63,7 @@ export default function TradeJournal({ quickLogSymbol, onQuickLogHandled }: {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     await api.addTrade({
-      direction: fd.get('direction') as string,
+      direction: fd.get('direction') as 'LONG' | 'SHORT',
       symbol: fd.get('symbol') as string,
       entry_date: fd.get('entry_date') as string,
       entry_price: parseFloat(fd.get('entry_price') as string),

@@ -1,9 +1,12 @@
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
+from pathlib import Path
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from backend.database import init_db
 from backend.routers import market, journal, macro, pipeline
 from backend.auth import require_auth
@@ -14,9 +17,16 @@ app = FastAPI(
     description="Full-stack dashboard for the PSX investment pipeline.",
 )
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        FRONTEND_URL,
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,3 +54,9 @@ def health(_: str = Depends(require_auth)):
 @app.post("/api/auth/login")
 def login(_: str = Depends(require_auth)):
     return {"user": _, "message": "Authenticated"}
+
+
+# ─── Serve built frontend (SPA) ─────────────────────────────────────
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+if STATIC_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="frontend")

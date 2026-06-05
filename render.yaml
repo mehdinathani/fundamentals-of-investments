@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: psx-invest
+    runtime: docker
+    repo: https://github.com/mehdinathani/fundamentals-of-investments
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: AUTH_USER
+        value: admin
+      - key: AUTH_PASS
+        value: psx2026
+      - key: FRONTEND_URL
+        value: https://psx-invest.vercel.app

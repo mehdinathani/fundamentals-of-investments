@@ -12,9 +12,10 @@ venv/
 *.db
 data/*.db
 
-# Node / frontend
-node_modules/
+# Build artifacts
+backend/static/
 frontend/dist/
+node_modules/
 frontend/node_modules/
 
 # OS / editor
