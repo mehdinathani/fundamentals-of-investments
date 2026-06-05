@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Receipt } from 'lucide-react';
 import { api } from '../api/client';
 import type { SymbolData } from '../types';
 
-export default function MarketGrid() {
+export default function MarketGrid({ onQuickLog }: { onQuickLog: (symbol: string) => void }) {
   const [data, setData] = useState<SymbolData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'buys'>('all');
@@ -49,6 +50,7 @@ export default function MarketGrid() {
               <th className="text-right p-3 font-medium">ADX</th>
               <th className="text-right p-3 font-medium">Vol</th>
               <th className="text-center p-3 font-medium">Signal</th>
+              <th className="text-right p-3 font-medium" />
             </tr>
           </thead>
           <tbody>
@@ -72,6 +74,15 @@ export default function MarketGrid() {
                   ) : (
                     <span className="text-dim text-xs">—</span>
                   )}
+                </td>
+                <td className="p-3 text-right">
+                  <button
+                    onClick={() => onQuickLog(s.symbol)}
+                    className="text-dim hover:text-gold transition-colors"
+                    title={`Log trade for ${s.symbol}`}
+                  >
+                    <Receipt className="w-3.5 h-3.5" />
+                  </button>
                 </td>
               </tr>
             ))}

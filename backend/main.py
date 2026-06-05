@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import init_db
 from backend.routers import market, journal, macro, pipeline
+from backend.auth import require_auth
 
 app = FastAPI(
     title="PSX Investment System",
@@ -15,7 +20,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["WWW-Authenticate"],
 )
+
 
 app.include_router(market.router)
 app.include_router(journal.router)
@@ -29,5 +36,11 @@ def startup():
 
 
 @app.get("/api/health")
-def health():
+def health(_: str = Depends(require_auth)):
     return {"status": "ok", "version": "1.0.0"}
+
+
+# Expose auth check endpoint (frontend uses this to verify credentials)
+@app.post("/api/auth/login")
+def login(_: str = Depends(require_auth)):
+    return {"user": _, "message": "Authenticated"}

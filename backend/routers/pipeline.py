@@ -9,8 +9,9 @@ from backend.services.journal_service import (
     save_signals, record_macro_state,
 )
 from backend.models import PipelineRun
+from backend.auth import require_auth
 
-router = APIRouter(prefix="/api/pipeline", tags=["pipeline"])
+router = APIRouter(prefix="/api/pipeline", tags=["pipeline"], dependencies=[Depends(require_auth)])
 
 
 @router.post("/run")

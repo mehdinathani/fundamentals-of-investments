@@ -3,12 +3,13 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from backend.database import get_db
+from backend.auth import require_auth
 from backend.schemas import TradeCreate, TradeUpdate, TradeOut
 from backend.services.journal_service import (
     create_trade, close_trade, get_trades, get_open_trades, get_performance,
 )
 
-router = APIRouter(prefix="/api/journal", tags=["journal"])
+router = APIRouter(prefix="/api/journal", tags=["journal"], dependencies=[Depends(require_auth)])
 
 
 @router.get("/trades")

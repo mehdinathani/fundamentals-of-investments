@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
+from backend.auth import require_auth
 from backend.services.macro_service import get_current_macro_state
 from backend.services.journal_service import record_macro_state, get_latest_macro
 
-router = APIRouter(prefix="/api/macro", tags=["macro"])
+router = APIRouter(prefix="/api/macro", tags=["macro"], dependencies=[Depends(require_auth)])
 
 
 @router.get("/state")

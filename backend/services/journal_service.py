@@ -12,6 +12,7 @@ from backend.schemas import TradeCreate, TradeUpdate
 def create_trade(db: Session, t: TradeCreate) -> Trade:
     trade = Trade(
         symbol=t.symbol,
+        direction=t.direction,
         entry_date=t.entry_date,
         entry_price=t.entry_price,
         shares=t.shares,
@@ -30,6 +31,13 @@ def close_trade(db: Session, trade_id: int, u: TradeUpdate) -> Optional[Trade]:
         return None
     for key, val in u.model_dump(exclude_unset=True).items():
         setattr(trade, key, val)
+    if u.exit_price is not None and trade.entry_price:
+        if trade.direction == "SHORT":
+            gross = (trade.entry_price - u.exit_price) * trade.shares
+        else:
+            gross = (u.exit_price - trade.entry_price) * trade.shares
+        trade.pnl_gross = round(gross, 2)
+        trade.pnl_net = round(gross - (u.fees or 0), 2)
     db.commit()
     db.refresh(trade)
     return trade

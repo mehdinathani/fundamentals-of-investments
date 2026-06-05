@@ -13,8 +13,8 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
 BACKEND_PID=$!
 sleep 2
 
-# Check backend
-if curl -sf http://localhost:8000/api/health > /dev/null 2>&1; then
+# Check backend (auth is required now)
+if curl -sf -u admin:psx2026 http://localhost:8000/api/health > /dev/null 2>&1; then
     echo "  ✅ Backend running on http://localhost:8000"
 else
     echo "  ❌ Backend failed to start"
@@ -32,6 +32,9 @@ echo ""
 echo "  ✅ Frontend running on http://localhost:5173"
 echo ""
 echo "  📊 PSX Invest System is ready!"
+echo "  ─────────────────────────────"
+echo "  🔐 Login: admin / psx2026"
+echo "  ─────────────────────────────"
 echo "  Press Ctrl+C to stop both servers."
 
 # Cleanup on exit

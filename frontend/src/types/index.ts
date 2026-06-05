@@ -35,6 +35,7 @@ export interface ScanResult {
 export interface Trade {
   id: number;
   symbol: string;
+  direction: 'LONG' | 'SHORT';
   entry_date: string;
   entry_price: number;
   exit_date: string | null;

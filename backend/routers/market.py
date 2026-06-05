@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from typing import Optional
 
 from backend.services.signal_service import scan_all_symbols, scan_symbol
 from backend.services.macro_service import get_current_macro_state
+from backend.auth import require_auth
 
-router = APIRouter(prefix="/api/market", tags=["market"])
+router = APIRouter(prefix="/api/market", tags=["market"], dependencies=[Depends(require_auth)])
 
 
 @router.get("/scan")

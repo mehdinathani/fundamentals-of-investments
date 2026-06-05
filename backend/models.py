@@ -8,6 +8,7 @@ class Trade(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     symbol = Column(String(10), nullable=False, index=True)
+    direction = Column(String(5), nullable=False, default="LONG")
     entry_date = Column(Date, nullable=False)
     entry_price = Column(Float, nullable=False)
     exit_date = Column(Date, nullable=True)

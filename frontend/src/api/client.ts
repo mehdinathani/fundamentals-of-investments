@@ -2,16 +2,46 @@ import type { MacroState, ScanResult, Trade, Performance, PipelineStatus } from 
 
 const BASE = '/api';
 
+let _auth: string | null = null;
+
+export function setAuth(user: string, pass: string) {
+  _auth = btoa(`${user}:${pass}`);
+}
+
+export function clearAuth() {
+  _auth = null;
+}
+
+export function isAuthed(): boolean {
+  return _auth !== null;
+}
+
 async function fetchJSON<T>(url: string, opts?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (_auth) {
+    headers['Authorization'] = `Basic ${_auth}`;
+  }
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...opts,
   });
+  if (res.status === 401) {
+    clearAuth();
+    throw new Error('Unauthorized');
+  }
   if (!res.ok) {
     const err = await res.text();
     throw new Error(err || res.statusText);
   }
   return res.json();
+}
+
+export async function login(user: string, pass: string): Promise<void> {
+  const headers: Record<string, string> = {};
+  headers['Authorization'] = `Basic ${btoa(`${user}:${pass}`)}`;
+  const res = await fetch(`${BASE}/auth/login`, { method: 'POST', headers });
+  if (!res.ok) throw new Error('Invalid credentials');
+  setAuth(user, pass);
 }
 
 export const api = {

@@ -236,6 +236,13 @@ Rationale: rules cover entry, exit, stop-loss. They do **not** cover the case wh
 - No comments unless the WHY is non-obvious.
 - Smallest viable change; no unrelated edits.
 
+### Tool Usage
+
+- **Context7 for docs:** Always use Context7 (`context7_query-docs` / `context7_resolve-library-id`) before writing library or framework code. Never rely on internal knowledge for API patterns, method signatures, or configuration. Fetch the actual docs.
+- **Skills first:** Always load and follow the relevant skill before implementing a domain-specific task. Skills encode the rules, thresholds, and workflows. If a skill exists for the task, use it — do not reimplement from scratch.
+- **No guessing APIs:** When integrating a third-party library, always resolve the Context7 library ID and query the docs. Never invent method names, parameters, or import paths from memory.
+- **Skill bundling:** Skills in `.claude/skills/` are the authoritative source for their domain. Before editing a skill, read it fully. Before implementing a change, check if the change belongs in a skill file first.
+
 ### Testing
 
 - Phase 1 (Strategy Validation) happens manually in Excel before any automation.
@@ -246,7 +253,7 @@ Rationale: rules cover entry, exit, stop-loss. They do **not** cover the case wh
 ### Security
 
 - No secrets or tokens in code — use `.env` and docs.
-- No hardcoded API keys or credentials.
+- No hardcoded API keys or credentials (exception: hardcoded auth credentials in `backend/auth.py` for deployment access control).
 - PSX portals use public data — no authentication secrets needed for reads.
 
 ## Phase Gating (NEW, §8 + §15.12)
@@ -274,5 +281,5 @@ Each phase from research.md §8 is a constitutional gate. A later phase MUST NOT
 - **Ratification date:** 2026-05-05 (preserved from v1.0.0).
 - **Last Amended:** 2026-05-06 (v2.0.0 rewrite).
 
-**Version:** 2.1.0 | **Ratified:** 2026-05-05 | **Last Amended:** 2026-05-31
+**Version:** 2.2.0 | **Ratified:** 2026-05-05 | **Last Amended:** 2026-05-31
 **ADR-004:** Proceed with conditional edge — backtest gate overridden for PSX-specific context.

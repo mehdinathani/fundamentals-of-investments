@@ -68,13 +68,20 @@ Starting PSX Investment System...
 [2/2] Starting frontend...  ✅ Frontend running on http://localhost:5173
 ```
 
-### Step 3: Open the Dashboard
+### Step 3: Log In
 Open your web browser (Chrome, Edge, etc.) and go to:
 ```
 http://localhost:5173
 ```
 
-That's it. You should see the dashboard with your trade journal, market scan, and macro indicator.
+You'll see a **login screen**. Enter:
+- **Username:** `admin`
+- **Password:** `psx2026`
+
+> **To change credentials:** Edit `backend/auth.py` and change `AUTH_USER` / `AUTH_PASS`.
+
+### Step 4: Use the Dashboard
+Once logged in, you'll see the dashboard with your trade journal, market scan, and macro indicator.
 
 ### Step 4: To Stop the App
 Press `Ctrl + C` in the terminal window. Both servers will shut down.

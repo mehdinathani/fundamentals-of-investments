@@ -5,6 +5,7 @@ from typing import Optional
 
 class TradeCreate(BaseModel):
     symbol: str
+    direction: str = "LONG"
     entry_date: date
     entry_price: float
     shares: int
@@ -25,6 +26,7 @@ class TradeUpdate(BaseModel):
 class TradeOut(BaseModel):
     id: int
     symbol: str
+    direction: str
     entry_date: date
     entry_price: float
     exit_date: Optional[date] = None
