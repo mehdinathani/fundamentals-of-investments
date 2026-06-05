@@ -1,10 +1,12 @@
 services:
   - type: web
-    name: psx-invest
-    runtime: docker
+    name: psx-invest-api
+    runtime: python
     repo: https://github.com/mehdinathani/fundamentals-of-investments
     plan: free
-    dockerfilePath: ./Dockerfile
+    branch: feature/psx-skills-architecture
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: AUTH_USER
         value: admin
