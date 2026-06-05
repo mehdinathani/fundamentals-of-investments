@@ -4,6 +4,7 @@ import MarketGrid from './components/MarketGrid';
 import PipelineControls from './components/PipelineControls';
 import PerformanceCard from './components/PerformanceCard';
 import TradeJournal from './components/TradeJournal';
+import SymbolDetail from './components/SymbolDetail';
 import { BarChart3, Lock } from 'lucide-react';
 import { isAuthed, login } from './api/client';
 
@@ -76,6 +77,7 @@ export default function App() {
   const [authed, setAuthed] = useState(isAuthed());
   const [refreshKey, setRefreshKey] = useState(0);
   const [quickLogSymbol, setQuickLogSymbol] = useState<string | null>(null);
+  const [detailSymbol, setDetailSymbol] = useState<string | null>(null);
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   if (!authed) {
@@ -114,7 +116,7 @@ export default function App() {
             <PerformanceCard />
           </div>
           <div className="lg:col-span-3" key={`market-${refreshKey}`}>
-            <MarketGrid onQuickLog={setQuickLogSymbol} />
+            <MarketGrid onQuickLog={setQuickLogSymbol} onViewDetail={setDetailSymbol} />
           </div>
         </div>
 
@@ -122,6 +124,10 @@ export default function App() {
           <TradeJournal quickLogSymbol={quickLogSymbol} onQuickLogHandled={() => setQuickLogSymbol(null)} />
         </div>
       </main>
+
+      {detailSymbol && (
+        <SymbolDetail symbol={detailSymbol} onClose={() => setDetailSymbol(null)} />
+      )}
     </div>
   );
 }

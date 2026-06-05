@@ -25,6 +25,10 @@ export interface SymbolData {
   date: string;
 }
 
+export interface SymbolDetail extends SymbolData {
+  macro: MacroState;
+}
+
 export interface ScanResult {
   total_scanned: number;
   buy_signals: number;

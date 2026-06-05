@@ -3,7 +3,7 @@ import { Receipt } from 'lucide-react';
 import { api } from '../api/client';
 import type { SymbolData } from '../types';
 
-export default function MarketGrid({ onQuickLog }: { onQuickLog: (symbol: string) => void }) {
+export default function MarketGrid({ onQuickLog, onViewDetail }: { onQuickLog: (symbol: string) => void; onViewDetail: (symbol: string) => void }) {
   const [data, setData] = useState<SymbolData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'buys'>('all');
@@ -56,7 +56,11 @@ export default function MarketGrid({ onQuickLog }: { onQuickLog: (symbol: string
           <tbody>
             {displayed.map((s) => (
               <tr key={s.symbol} className="border-t border-navy-700 hover:bg-navy-800/50 transition-colors">
-                <td className="p-3 font-medium">{s.symbol}</td>
+                <td className="p-3 font-medium">
+                  <button onClick={() => onViewDetail(s.symbol)} className="hover:text-gold transition-colors cursor-pointer">
+                    {s.symbol}
+                  </button>
+                </td>
                 <td className="p-3 text-right font-mono">
                   {s.current_price?.toFixed(2) ?? '-'}
                 </td>
