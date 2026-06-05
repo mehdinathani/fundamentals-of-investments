@@ -46,7 +46,7 @@ def startup():
 
 
 @app.get("/api/health")
-def health(_: str = Depends(require_auth)):
+def health():
     return {"status": "ok", "version": "1.0.0"}
 
 
