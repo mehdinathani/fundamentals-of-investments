@@ -13,6 +13,16 @@ allowed-tools: Read, Write, Bash, mcp__context7__query-docs, mcp__context7__reso
 
 # PSX Backtester
 
+## 👤 Who This Is For
+
+**This is your safety net.** Before risking a single rupee, you can test your strategy against years of historical PSX data.
+
+CA analysts model strategies in Excel to validate their edge. Old investors "backtest" by remembering what worked before. You have neither the Excel skills nor the experience — so this skill does the backtesting for you.
+
+**The rule:** If a strategy doesn't work in backtest (on past data), it won't work in real life. Don't deploy it. This skill prevents you from making expensive mistakes that beginners typically learn the hard way.
+
+---
+
 Validates strategy profitability before live deployment. Per `research.md` §8 Phase 1: **"If not profitable → STOP"**. This skill is the gate. No strategy progresses to semi-automation (Phase 2) or live capital without passing here.
 
 ## What This Skill Does

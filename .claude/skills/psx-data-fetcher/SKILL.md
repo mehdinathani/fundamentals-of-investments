@@ -10,7 +10,13 @@ allowed-tools: Read, Write, Bash, WebFetch, mcp__context7__query-docs, mcp__cont
 
 # PSX Data Fetcher
 
-Fetches data from Pakistan Stock Exchange portals: DPS (Data Portal Service), main PSX site, and financials portal.
+## 👤 Who This Is For
+
+**This is the data pipeline that powers everything else.** A CA analyst spends hours gathering data from multiple sources (DPS portal, company websites, broker reports). This skill automates that — giving you the same raw data in minutes.
+
+You never need to manually visit dps.psx.com.pk, search for a company, and copy-paste numbers. This skill does it all automatically.
+
+---
 
 ## What This Skill Does
 

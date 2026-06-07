@@ -11,7 +11,29 @@ allowed-tools: Read, Write, Bash, mcp__context7__query-docs, mcp__context7__reso
 
 # Trade Rules Engine
 
-Encodes the exact entry, exit, and signal logic for the PSX investment system. Claude Code MUST use these rules verbatim — never invent or modify thresholds.
+## 👤 Who This Is For
+
+**You are a student with basic investing knowledge.** You know what "buy low, sell high" means. You maybe understand that moving averages exist. But you don't have:
+
+- 5,000+ hours of chart time (experienced traders)
+- A CA/CFA qualification in technical analysis
+- The discipline to follow rules when emotions run high
+
+**This skill is your edge.** Experienced traders develop "chart intuition" from years of watching price action. You don't have that — but you have hard rules. On PSX, where manipulation is common and emotions kill returns, hard rules consistently outperform intuition.
+
+## 🧠 Why This Matters — Student vs Pro
+
+| What an experienced trader does | What this skill does for you |
+|---|---|
+| Looks at a chart and "feels" whether to buy | Applies MA crossover + RSI + volume rules — removes emotion |
+| Spots golden crosses from memory | Calculates exact crossover points automatically |
+| Reads volume as "heavy" or "light" | Compares against precise 30-day averages |
+| Recognizes overbought/oversold from experience | Uses exact RSI 30/70 thresholds |
+| Gets stopped out and learns the hard way | Encodes 5% stop-loss as a hard rule, not a suggestion |
+
+**You follow rules. They follow feelings. Rules beat feelings over 100 trades.**
+
+---
 
 ## What This Skill Does
 
@@ -88,6 +110,18 @@ Generate BUY signals only when ALL conditions are met:
 
 #### 3A. Moving Average Crossover (MANDATORY)
 
+**In plain language:** Is the stock trending up or down?
+
+A "moving average" is just the average price over the last N days. It smooths out daily noise so you can see the real direction.
+
+- **20-day SMA** = Short-term trend (last month)
+- **50-day SMA** = Medium-term trend (last 2.5 months)
+- **200-day SMA** = Long-term trend (last 10 months)
+
+The "golden cross" (20-day crossing above 50-day) means the short-term trend is getting stronger than the medium-term trend — a classic buy signal. Being above the 200-day means the long-term trend is also up.
+
+**What a pro does:** Glances at a chart and spots the crossover visually in seconds. This skill does the math — no chart reading required.
+
 ```
 BUY signal triggers when ALL of:
   1. 20-day SMA crosses ABOVE 50-day SMA (golden cross short-term)
@@ -110,6 +144,20 @@ SELL signal triggers when ANY of:
 
 #### 3B. RSI Threshold (MANDATORY — use with MA crossover)
 
+**In plain language:** Is the stock overbought or oversold?
+
+The Relative Strength Index (RSI) measures how strong recent price changes are on a scale of 0-100. Think of it as a "momentum meter":
+
+- **RSI < 30** = Oversold. The stock has fallen too fast and may bounce back. Consider buying.
+- **RSI 30-40** = Weakening. The stock is losing momentum. Watch for recovery.
+- **RSI 40-60** = Neutral. Normal range. No strong signal either way.
+- **RSI 60-70** = Strengthening. The stock is gaining momentum but not yet overbought.
+- **RSI > 70** = Overbought. The stock has risen too fast and may pull back. Consider selling.
+
+**⚠️ PSX-specific:** On PSX, stocks can stay overbought (RSI > 70) for weeks in a strong uptrend. Never short a stock just because RSI is high — wait for the MA crossover to confirm a sell signal.
+
+**What a pro does:** Knows these thresholds from experience and can spot them on a chart instantly. This skill removes the guesswork.
+
 ```
 BUY: RSI(14) is between 40 and 60 (neutral zone, entering momentum)
      OR RSI(14) crosses ABOVE 30 (recovering from oversold)
@@ -128,6 +176,18 @@ SELL: RSI(14) > 70 (overbought — consider partial profit)
 | Neutral zone | 40-60 |
 
 #### 3C. Volume Confirmation (MANDATORY)
+
+**In plain language:** Is anyone else buying this stock?
+
+Volume measures how many shares are trading. Low volume means few people are interested. A price move on low volume is unreliable — it could be one big trader manipulating the price.
+
+- **Volume > 120% of 30-day avg** = Genuine interest. Confident signal.
+- **Volume < 100%** = Weak. Skip the trade — the move might not last.
+- **Volume > 300%** = Spike. Check for news. Could be a pump that reverses tomorrow.
+
+**⚠️ This is THE beginner trap on PSX:** Beginners see a stock moving up and buy without checking volume. The stock then reverses because there was no genuine demand. This rule prevents that mistake.
+
+**What a pro does:** Scans volume bars on a chart and instantly knows if volume is "heavy" or "light." This skill gives you the same information as numbers.
 
 ```
 Every BUY signal MUST have volume confirmation:
@@ -202,37 +262,101 @@ When a profit-taking exit fires (e.g., MA sell signal, RSI > 70) within **30 cal
 
 ---
 
+## Signal Output — Must Include Full Evidence
+
+**Every signal must return the reasoning chain, not just the verdict.** The user should see exactly why each rule triggered.
+
+```python
+@dataclass
+class SignalResult:
+    symbol: str
+    signal: Literal["BUY", "HOLD", "SELL"]
+    tier: Literal["Tier 1", "Tier 2", "Tier 3", None] = None
+    evidence: dict = field(default_factory=dict)
+    # evidence = {
+    #     "ma_crossover": {"ma20": 98.5, "ma50": 96.2, "status": "bullish_cross"},
+    #     "rsi": {"value": 55.2, "zone": "neutral", "status": "pass"},
+    #     "volume": {"current": 1.5e6, "avg_30d": 1.03e6, "ratio": 1.45, "status": "confirmed"},
+    #     "trend": {"price": 102.5, "ma200": 88.0, "status": "above"},
+    #     "reason": "MA20(98.5) crossed above MA50(96.2) with RSI 55.2 (neutral) and volume 145% of 30d avg"
+    # }
+```
+
 ## Complete Signal Logic
 
 ```python
 def generate_signal(price_data, volume_data, ma_20, ma_50, ma_200, rsi_14):
     """
-    Returns: "BUY" | "HOLD" | "SELL"
-
-    Rules are applied in order. First matching rule wins.
+    Returns: SignalResult with signal + full evidence dict
     """
+    evidence = {
+        "ma_crossover": {"ma20": ma_20, "ma50": ma_50, "ma200": ma_200},
+        "rsi": {"value": rsi_14, "zone": "neutral" if 40 <= rsi_14 <= 60 else "overbought" if rsi_14 > 70 else "oversold" if rsi_14 < 30 else "weak"},
+        "volume": {"current": volume_today, "avg_30d": volume_30d_avg, "ratio": volume_today / volume_30d_avg},
+        "trend": {"price": current_price, "ma200": ma_200},
+    }
 
     # 1. Check stop-loss (highest priority)
-    if current_price <= entry_price * 0.95:  # 5% stop
-        return "SELL"  # Stop-loss hit
+    if current_price <= entry_price * 0.95:
+        evidence["reason"] = f"Stop-loss hit: Price {current_price} ≤ entry {entry_price} × 0.95"
+        return SignalResult("SELL", evidence=evidence)
 
     # 2. Check MA crossover sell
-    if (ma_20 < ma_50) or (price_below_ma200_3days):
-        return "SELL"
+    if ma_20 < ma_50:
+        evidence["reason"] = f"MA20({ma_20:.1f}) crossed below MA50({ma_50:.1f}) — trend reversal"
+        evidence["ma_crossover"]["status"] = "bearish_cross"
+        return SignalResult("SELL", evidence=evidence)
+
+    if current_price < ma_200:
+        evidence["reason"] = f"Price({current_price}) below MA200({ma_200:.1f}) for 3+ days — long-term downtrend"
+        evidence["trend"]["status"] = "below"
+        return SignalResult("SELL", evidence=evidence)
 
     # 3. Check RSI overbought with MA confirmation
     if rsi_14 > 70 and ma_20 < ma_50:
-        return "SELL"
+        evidence["reason"] = f"RSI({rsi_14:.1f}) overbought (>70) + MA20 below MA50 — momentum breakdown"
+        evidence["rsi"]["zone"] = "overbought"
+        return SignalResult("SELL", evidence=evidence)
 
     # 4. Check MA crossover buy with ALL confirmations
+    vol_ratio = volume_today / volume_30d_avg
     if (ma_20 > ma_50 and
-        price > ma_200 and
-        rsi_14 >= 30 and rsi_14 <= 60 and
-        volume_today > 1.2 * volume_30d_avg):
-        return "BUY"
+        current_price > ma_200 and
+        30 <= rsi_14 <= 60 and
+        vol_ratio > 1.2):
 
-    # 5. Default
-    return "HOLD"
+        evidence["ma_crossover"]["status"] = "bullish_cross"
+        evidence["trend"]["status"] = "above"
+        evidence["volume"]["status"] = "confirmed"
+
+        # Determine tier
+        tier = "Tier 3"
+        if vol_ratio > 1.5 and 40 <= rsi_14 <= 55:
+            tier = "Tier 1"
+        elif vol_ratio > 1.2:
+            tier = "Tier 2"
+
+        evidence["reason"] = (
+            f"MA20({ma_20:.1f}) crossed above MA50({ma_50:.1f}) [Golden cross] | "
+            f"Price({current_price}) above MA200({ma_200:.1f}) [Uptrend] | "
+            f"RSI({rsi_14:.1f}) in neutral zone [Not overbought] | "
+            f"Volume {vol_ratio:.0%} of 30d avg [Confirmed]"
+        )
+        return SignalResult("BUY", tier=tier, evidence=evidence)
+
+    # 5. Default — HOLD with explanation
+    reasons = []
+    evidence["ma_crossover"]["status"] = "neutral"
+    evidence["volume"]["status"] = "unconfirmed"
+    if vol_ratio < 1.2:
+        reasons.append(f"Insufficient volume ({vol_ratio:.0%} of avg, need >120%)")
+    if rsi_14 > 60:
+        reasons.append(f"RSI too high ({rsi_14:.1f}, need ≤60)")
+    if rsi_14 < 30:
+        reasons.append(f"RSI too low ({rsi_14:.1f}, oversold — wait for recovery)")
+    evidence["reason"] = "; ".join(reasons) if reasons else "No signal conditions met"
+
+    return SignalResult("HOLD", evidence=evidence)
 ```
 
 ---
@@ -245,6 +369,20 @@ def generate_signal(price_data, volume_data, ma_20, ma_50, ma_200, rsi_14):
 | **Tier 2 (Moderate Buy)** | MA cross + RSI 30-40 or 55-60 + volume > 120% | Half position |
 | **Tier 3 (Hold/Weak)** | MA cross without volume OR RSI outside range | Watch only |
 | **Sell** | Any sell condition met | Exit (full or partial) |
+
+---
+
+---
+
+## 🎯 Takeaway for a Student Investor
+
+After this skill runs, you have the same technical analysis an experienced trader produces — without spending 5,000 hours watching charts.
+
+**What the pro does:** Reads charts by eye, makes subjective judgments, and sometimes gets it wrong because emotions override logic.
+
+**What this skill does:** Applies exact mathematical rules to every stock, every time, with no emotions and no shortcuts.
+
+**The difference:** Your signals are consistent. The pro's signals depend on how they feel that day. Consistency wins over the long term.
 
 ---
 

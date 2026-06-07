@@ -74,3 +74,52 @@ export interface PipelineStatus {
   macro_state?: string;
   error?: string;
 }
+
+export interface BenchmarkComparison {
+  median: number | null;
+  deviation_pct: number | null;
+  verdict: string | null;
+  sector_name?: string;
+  count?: number;
+  symbols_in_sector?: number;
+}
+
+export interface RatioComparison {
+  value: number | null;
+  name: string;
+  comparisons: Record<string, BenchmarkComparison>;
+  percentile_rank?: number | null;
+}
+
+export interface ComparisonResult {
+  symbol: string;
+  sector: string | null;
+  sector_peers: string[];
+  sector_data_available: boolean;
+  price: number | null;
+  ratios: Record<string, RatioComparison>;
+}
+
+export interface AIActionPlan {
+  entry_zone: string;
+  stop_loss: string;
+  target_1: string;
+  target_2: string;
+  position_sizing: string;
+}
+
+export interface AIAnalysisResult {
+  symbol: string;
+  verdict: 'BUY' | 'SELL' | 'SHORT_SELL' | 'BUY_BACK' | 'STOP_LOSS' | 'HOLD';
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  time_horizon: string;
+  executive_summary: string;
+  fundamental_analysis: string;
+  technical_analysis: string;
+  macro_context: string;
+  risk_factors: string[];
+  action_plan: AIActionPlan;
+  peer_comparison: string;
+  generated_at: string | null;
+  ai_available: boolean;
+}

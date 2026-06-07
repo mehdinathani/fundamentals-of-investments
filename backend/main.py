@@ -8,7 +8,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from backend.database import init_db
-from backend.routers import market, journal, macro, pipeline
+from backend.routers import market, journal, macro, pipeline, analyze
 from backend.auth import require_auth
 
 app = FastAPI(
@@ -38,6 +38,7 @@ app.include_router(market.router)
 app.include_router(journal.router)
 app.include_router(macro.router)
 app.include_router(pipeline.router)
+app.include_router(analyze.router)
 
 
 @app.on_event("startup")

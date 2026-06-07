@@ -13,7 +13,33 @@ allowed-tools: Read, Write, Bash, Skill
 
 # PSX Orchestrator
 
-The conductor of the PSX investment system. Every other skill is a single layer; this skill chains them in the order specified by `research.md` §4. Skipping a step (e.g., signals without Layer 0) is how disciplined systems become undisciplined.
+## 👤 Who This Is For
+
+**This is where everything comes together.** Think of a professional investment firm: they have a team of analysts (each specializing in one thing) and a portfolio manager who chains their work together.
+
+- **Data team** fetches the numbers → `psx-data-fetcher`
+- **Risk officer** rejects bad stocks → `psx-market-filter`
+- **Fundamental analyst** computes ratios → `financial-ratios-psx`
+- **Technical analyst** generates signals → `trade-rules-engine`
+- **Risk manager** sizes positions → `risk-management`
+- **Performance analyst** logs everything → `psx-trade-journal`
+
+**You are the portfolio manager.** This skill is your team.
+
+## 🧠 Why This Matters — Student vs Pro
+
+| What a team of analysts does | What this skill does for you |
+|---|---|
+| Full-time data team fetches and cleans PSX data | Runs `psx-data-fetcher` in minutes |
+| Risk officer screens for manipulation/liquidity | Applies Layer 0 filter before any analysis |
+| CA analyst computes ratios and builds watchlist | Runs `financial-ratios-psx` + fundamental screen |
+| Technical analyst reads charts for entry/exit | Runs `trade-rules-engine` for signals |
+| Risk manager enforces position limits | Runs `risk-management` — blocking oversized trades |
+| Performance analyst tracks all trades | Runs `psx-trade-journal` with auto-metrics |
+
+**A full investment team costs PKR 5-20 million/year. This pipeline costs nothing and runs in minutes.**
+
+---
 
 ## What This Skill Does
 
@@ -114,6 +140,78 @@ The conductor of the PSX investment system. Every other skill is a single layer;
 
 ---
 
+## 📊 Evidence-Based Signals — No Blind Trust
+
+**Critical rule:** Every BUY/SELL/HOLD signal must include the complete evidence chain. The user should never have to "trust the AI" — they should see exactly why each decision was made.
+
+A CA analyst justifies every trade recommendation with evidence (financial statements, charts, ratios). This system does the same — with clear, traceable reasoning.
+
+### Signal Evidence Format
+
+Every signal output must include:
+
+```
+BUY: OGDC @ 102.50
+├─ Layer 0 (Market Filter): ✅ PASS
+│   ├─ Volume: 1.2M (avg 800K) → ✅ Above liquidity floor
+│   ├─ Spread: 0.35% → ✅ Below 2% threshold
+│   └─ No operator behavior detected → ✅ Clean
+├─ Layer 1 (Fundamentals): ✅ PASS
+│   ├─ ROE: 18.5% (KSE-100 median: 14.2%) → ✅ ABOVE benchmark
+│   ├─ D/E: 0.32 (KSE-100 median: 0.48) → ✅ BELOW benchmark (less debt)
+│   ├─ Rev CAGR 3yr: 12.1% (KSE-100 median: 8.5%) → ✅ ABOVE benchmark
+│   └─ PAT CAGR 3yr: 15.3% → ✅ Above 10% threshold
+├─ Layer 2 (Technical): ✅ SIGNAL TRIGGERED
+│   ├─ MA20 (98.5) crossed ABOVE MA50 (96.2) → ✅ Golden cross
+│   ├─ Price (102.5) ABOVE MA200 (88.0) → ✅ Uptrend confirmed
+│   ├─ RSI(14): 55.2 (neutral zone 40-60) → ✅ Not overbought
+│   └─ Volume: 145% of 30-day avg → ✅ Confirmed
+├─ Layer 3 (Risk): ✅ APPROVED
+│   ├─ Position: 1,920 shares × 102.50 = PKR 196,800 (9.8% of account)
+│   ├─ Stop-loss: 97.40 (5%) → Max loss: PKR 9,792 (0.49% of account)
+│   └─ Account capacity: 4 open positions (7 max, 30% cash) → ✅
+└─ Signal Quality: TIER 1 (Strong Buy)
+```
+
+### Heatmaps (Visual Evidence)
+
+Generate sector-level heatmaps to show where the market is moving:
+
+```python
+# Sector Performance Heatmap (last 5 trading days)
+# Colors: 🔥 Green = strong positive, 🟡 Yellow = flat, 🔴 Red = negative
+#
+# ┌────────────────────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+# │ Sector                 │ Mon      │ Tue      │ Wed      │ Thu      │ Fri      │
+# ├────────────────────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+# │ 🏭 Cement              │ +1.2%    │ -0.5%    │ +2.1%    │ +0.8%    │ +1.5%    │
+# │ 🏦 Commercial Banks    │ +0.3%    │ +0.1%    │ -0.2%    │ +0.4%    │ -0.1%    │
+# │ ⛽ Oil & Gas           │ -0.8%    │ -1.2%    │ +0.5%    │ -0.3%    │ +0.7%    │
+# │ 💊 Pharma              │ +0.1%    │ -0.3%    │ -0.1%    │ +0.2%    │ -0.4%    │
+# │ 💻 Technology          │ +3.5%    │ +2.8%    │ -1.0%    │ +4.2%    │ +1.8%    │
+# └────────────────────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+**Purpose:** A student can immediately see which sectors are hot (green) and which are cooling (red) — without needing to interpret raw numbers.
+
+### Trade Bars (Price Evidence)
+
+For each signal, show the stock's recent price action with visual markers:
+
+```
+OGDC — Last 20 Trading Days
+Price: ┤ 98  100  101  100  99   101  102  101  100  102  103  102  104  103  102  101  102  103  102  102.5
+MA20:  ┤ 97   97   98   98   98   98   98   98   98   98   98   99   99   99   99   99   99   99   99   98.5
+MA50:  ┤ 95   95   95   95   95   95   95   95   96   96   96   96   96   96   96   96   96   96   96   96.2
+Vol:   ┤ 0.8  0.9  1.1  0.7  0.6  1.3  1.5  0.9  0.8  1.2  1.4  1.1  0.9  1.0  0.7  0.8  1.1  1.3  1.2  1.5
+                                                                                              ↑BUY
+Signal: MA20(98.5) crossed above MA50(96.2) on Day 20 with volume 1.5M (145% of avg)
+```
+
+**Purpose:** The student can visually see the crossover and volume spike that triggered the signal — evidence they can verify with their own eyes.
+
+---
+
 ## Decision Sheet (output contract)
 
 The orchestrator writes a single markdown report:
@@ -128,43 +226,45 @@ Structure:
 # PSX Daily Run — 2026-05-05 09:15 PKT
 Mode: dry-run | Account: PKR 2,000,000 | Capital tier: standard
 
-## 0. Universe
+## 0. Market Overview — Heatmap
+[Sector performance heatmap for last 5 days — see Heatmap section above]
+
+## 1. Universe
 - Total PSX listings considered: N
 - After Layer 0 (market filter): M  (rejected: list with reasons)
 
-## 1. Watchlist (after fundamental screen)
-| Symbol | Sector | ROE | D/E | Rev CAGR 3y | Fund score |
-|--------|--------|-----|-----|-------------|------------|
-| ENGRO  | Fert.  | 22% | 0.4 | 11%         | 84/100     |
+## 2. Watchlist (after fundamental screen)
+| Symbol | Sector | ROE | D/E | Rev CAGR 3y | vs KSE-100 | Fund score |
+|--------|--------|-----|-----|-------------|------------|------------|
+| ENGRO  | Fert.  | 22% | 0.4 | 11%         | ABOVE avg  | 84/100     |
 | ...
 
-## 2. Today's Signals
-| Symbol | Signal | Tier | Entry | Stop | Target | Volume conf | Notes |
-|--------|--------|------|-------|------|--------|-------------|-------|
-| OGDC   | BUY    | 1    | 102.5 | 97.4 | 117.9  | 145% avg    | ...   |
+## 3. Today's Signals — With Full Evidence
+<for each BUY/SELL/HLD signal, include the full evidence block>
+[See Signal Evidence Format above]
 
-## 3. Risk-Approved Trades
+## 4. Risk-Approved Trades
 | Symbol | Shares | PKR | % of acct | Max loss PKR | Stop |
 |--------|--------|-----|-----------|--------------|------|
 | OGDC   | 1,920  | 196,800 | 9.8%  | 9,792        | 97.4 |
 
-## 4. Sells / Exits
+## 5. Sells / Exits
 | Symbol | Reason | Action |
 |--------|--------|--------|
 | ...
 
-## 5. Skipped (with audit reason)
+## 6. Skipped (with audit reason)
 - LUCK: Layer 0 reject — operator behavior (5.4% move on 0.8× volume)
-- HBL:  Layer 1 reject — D/E 0.78 > 0.6
-- POWER: Layer 2 reject — RSI 78 > 70
+- HBL:  Layer 1 reject — D/E 0.78 > 0.6 (KSE-100 median: 0.48)
+- POWER: Layer 2 reject — RSI 78 > 70 (overbought)
 
-## 6. Portfolio Snapshot
+## 7. Portfolio Snapshot
 - Cash: PKR 600,000 (30%)
 - Invested: PKR 1,400,000 (70%)
 - Open positions: 4 / max 7
 - Drawdown from peak: -2.1%
 
-## 7. Flags & Notes
+## 8. Flags & Notes
 - (any rule-violation alerts from journal review)
 - (ADR suggestions if any)
 ```

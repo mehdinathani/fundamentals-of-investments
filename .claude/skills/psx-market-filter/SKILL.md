@@ -13,14 +13,37 @@ allowed-tools: Read, Write, Bash
 
 # PSX Market Filter (Layer 0)
 
-Implements the Market Reality Filter described in `research.md` §4 Layer 0 — the CRITICAL first gate of the PSX investment system. Pakistan's market is structurally different from developed markets: mid/small caps are routinely manipulated, liquidity is thin, and information asymmetry is severe. This skill rejects bad candidates before they consume analysis budget.
+## 👤 Who This Is For
+
+**You are a student who knows the basics of investing.** You understand what a stock is, what "buy low, sell high" means, and maybe you've followed a few PSX stocks on a broker app. But you don't have:
+
+- 10 years of market experience (the "old investor")
+- ACCA/CA qualifications in financial analysis
+- A research team producing reports
+
+**That's fine.** This skill automates what experienced pros do instinctively — reject bad stocks before they waste your time (and money). While they use gut feel from years of watching the market, you use hard rules. And on PSX, rules beat gut feel.
+
+---
+
+## 🧠 Why This Matters — Student vs Pro
+
+| What a CA/CFA analyst does | What this skill does for you |
+|---|---|
+| Scans 500+ stocks, mentally rejects illiquid ones from years of experience | Applies 6 hard filters automatically — no experience needed |
+| Recognizes manipulation patterns from seeing them for 10+ years | Detects operator behavior with math (price + volume rules) |
+| Knows which stocks become untradable due to circuit breakers | Flags circuit-locked stocks immediately |
+| Calculates spread cost before entering | Rejects stocks where the spread alone destroys profit |
+
+**You start with the same clean universe they start with — but you get there in seconds, not years.**
+
+---
 
 ## What This Skill Does
 
 - Rejects stocks with insufficient liquidity (volume, value traded, freefloat)
 - Rejects stocks with wide bid-ask spreads (transaction cost too high)
-- Detects operator-driven price action (price moves disproportionate to volume)
-- Detects suspicious volume spikes (potential pump activity)
+- Detects operator-driven price action (price moves disproportionate to volume = manipulation)
+- Detects suspicious volume spikes (potential pump activity — the #1 beginner trap on PSX)
 - Flags circuit-locked stocks (unable to exit cleanly)
 - Outputs a **tradable universe** — the only set allowed downstream
 
@@ -46,7 +69,16 @@ Implements the Market Reality Filter described in `research.md` §4 Layer 0 — 
 
 ## Filter Pipeline (apply in order; first failure = REJECT)
 
-### Filter 1 — Liquidity Floor (HARD)
+### 🔍 Filter 1 — Liquidity Floor (HARD)
+
+**In plain language:** Can you actually buy and sell this stock without getting stuck?
+
+Imagine you buy 1,000 shares of a stock, then try to sell them a week later — but nobody is buying. You're stuck. This filter prevents that.
+
+- **Volume** = how many shares trade hands daily. Low volume = you might not find a buyer when you want to exit.
+- **Value** = volume × price. PKR 5M/day means there's real money flowing through this stock.
+- **Freefloat** = % of shares available to the public (not held by founders/family). Low freefloat = a few people control the price.
+- **Days traded** = has this stock traded every day? Stale stocks don't move.
 
 | Metric | Threshold | Rationale |
 |--------|-----------|-----------|
@@ -57,7 +89,15 @@ Implements the Market Reality Filter described in `research.md` §4 Layer 0 — 
 
 **Reject if any threshold fails.** Conservative tier (capital < PKR 1M) tightens these by 2×.
 
-### Filter 2 — Spread Check (HARD)
+### 🔍 Filter 2 — Spread Check (HARD)
+
+**In plain language:** How much do you lose the moment you buy?
+
+The "spread" is the gap between what buyers are willing to pay (bid) and what sellers want (ask). When you buy a stock, you pay the ask price. If you immediately sold, you'd get the bid price. The spread is your instant loss.
+
+- **Spread < 0.5%** = Top-tier liquid stock (like KSE-30). Great.
+- **Spread 0.5-2%** = Acceptable for most KSE-100 stocks.
+- **Spread > 2%** = Reject. You lose 2% before the stock even moves. An experienced trader knows this instinctively — this filter encodes it as a rule.
 
 ```
 spread_pct = (best_ask - best_bid) / last_price × 100
@@ -71,7 +111,16 @@ spread_pct = (best_ask - best_bid) / last_price × 100
 
 For mid-caps, use 5-day average spread, not snapshot (intraday spreads spike).
 
-### Filter 3 — Operator-Behavior Detector (HARD)
+### 🔍 Filter 3 — Operator-Behavior Detector (HARD)
+
+**In plain language:** Is this stock being manipulated?
+
+On PSX, some stocks are "operated" — a group of traders pushes the price up on low volume (cheap to manipulate), then dumps on retail buyers who jump in late. This is the #1 way beginners lose money on PSX.
+
+- **Price moves > 5% but volume is normal or low** → Suspicious. Real demand requires real volume.
+- **3+ days of >3% moves with declining volume** → Classic pump before dump.
+
+A CA analyst spots this from experience. This filter gives you that same pattern recognition.
 
 Operator-driven action = price moving without genuine demand. Pattern:
 
@@ -101,7 +150,17 @@ OR:
 
 Volume spikes in mid-caps without news are the #1 PSX manipulation signature.
 
-### Filter 5 — Circuit-Lock Filter (HARD)
+### 🔍 Filter 5 — Circuit-Lock Filter (HARD)
+
+**In plain language:** Is this stock stuck at its daily price limit?
+
+PSX limits how much a stock can move in one day (5% or 7.5% depending on the board). When a stock hits this limit, trading effectively stops — there are only buyers (upper circuit) or only sellers (lower circuit).
+
+- **Upper circuit** → You can buy but the price is already maxed. If it opens lower tomorrow, you lose immediately.
+- **Lower circuit** → You can't sell even if you want to. Your money is trapped.
+- **Hit circuit 2+ times in 5 days** → This stock is too volatile. Avoid.
+
+**Pro insight:** Beginners chase stocks hitting upper circuits (FOMO). Experienced investors know that once a stock hits circuit, the real game is when it reopens — not during the lock.
 
 PSX has 5%/7.5% daily circuit breakers (varies by board).
 
@@ -201,6 +260,20 @@ def market_reality_filter(stock: dict, capital_tier: str = "standard") -> Filter
 | ≥ PKR 5M | KSE-100 + select KMI-30 | Standard |
 
 Smaller capital → narrower universe. This is from `research.md` §7.
+
+---
+
+---
+
+## 🎯 Takeaway for a Student Investor
+
+After this filter runs, you have **the same tradable universe a CA analyst would build** — minus the 10 years of market experience they needed to get there.
+
+**What the pro does:** Mentally filters 500 stocks, rejects 400 by gut feel from experience.
+
+**What this skill does:** Applies 6 mathematical filters, rejects the same 400 stocks with hard data.
+
+**The difference:** None in the output. All in the process. Your output is cleaner because math doesn't have bad days.
 
 ---
 

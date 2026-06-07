@@ -13,7 +13,27 @@ allowed-tools: Read, Write, Bash
 
 # PSX Trade Journal
 
-Persistent record of every trade with structured attribution. Without this, there is no feedback loop — and without feedback, the strategy cannot improve. Per `research.md` §10, four metrics are NON-NEGOTIABLE: CAGR, Win/Loss ratio, Max Drawdown, Sharpe Ratio.
+## 👤 Who This Is For
+
+**This skill turns your trading into a learning system.** Without a journal, you repeat the same mistakes. With one, every loss teaches you something.
+
+CA analysts and institutional traders are required to maintain trade logs. It's part of their professional discipline. Old investors who survived decades have mental journals (they remember their painful losses vividly). You need a written one — because you don't have the years of experience to remember what went wrong.
+
+**The most important sentence in this system:** You will learn more from your 10th losing trade than your 10th winning trade — but only if you've written down why each one happened.
+
+## 🧠 Why This Matters — Student vs Pro
+
+| What a CA/pro does | What this skill does for you |
+|---|---|
+| Reflects on years of trades mentally | Logs every trade with structured fields — finds patterns in data |
+| Recognizes recurring mistakes from experience | Auto-flags rule violations (stop-loss ignored, oversized position) |
+| Tracks performance in a spreadsheet | Computes CAGR, Sharpe, drawdown automatically |
+| Adjusts strategy based on what worked | Generates monthly reviews with per-sector, per-tier breakdowns |
+| Has the discipline to review regularly | Creates an immutable audit trail — you can't hide from bad trades |
+
+**The difference:** A pro has 500 trades of experience in their head. This journal gives you the same data-driven feedback loop starting from trade #1.
+
+---
 
 ## What This Skill Does
 
@@ -245,6 +265,26 @@ Store violations in `rules_violated` field. Monthly review summarizes them.
 ## Decisions
 - (none / list)
 ```
+
+---
+
+---
+
+## 🎯 Takeaway for a Student Investor
+
+**This is your learning accelerator.** Most investors need years and hundreds of trades to build the experience that makes them profitable. This journal compresses that learning into data.
+
+After every 20 trades, review:
+- Which signal tier produced the best results? (If Tier 3 isn't working, stop using it)
+- Which sectors are you good at? (Specialize in what works)
+- How many rule violations? (If >1, discipline needs work)
+- Is your drawdown under control? (If >15%, tighten risk)
+
+**What the pro does:** Has the experience of hundreds of trades in their memory.
+
+**What this skill does:** Gives you the same data after 20 trades — plus trend analysis the pro can't do from memory alone.
+
+**The difference:** You improve faster because you measure everything.
 
 ---
 

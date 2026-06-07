@@ -1,19 +1,52 @@
 import { useEffect, useState } from 'react';
 import { Receipt } from 'lucide-react';
 import { api } from '../api/client';
-import type { SymbolData } from '../types';
+import type { SymbolData, AIAnalysisResult } from '../types';
 
-export default function MarketGrid({ onQuickLog, onViewDetail }: { onQuickLog: (symbol: string) => void; onViewDetail: (symbol: string) => void }) {
+const VERDICT_DOT: Record<string, string> = {
+  BUY: 'bg-green',
+  SELL: 'bg-red',
+  SHORT_SELL: 'bg-red',
+  BUY_BACK: 'bg-green',
+  STOP_LOSS: 'bg-yellow',
+  HOLD: 'bg-navy-500',
+};
+
+export default function MarketGrid({ onQuickLog, onViewDetail, onScanReady }: { onQuickLog: (symbol: string) => void; onViewDetail: (symbol: string) => void; onScanReady?: (symbols: string[]) => void }) {
   const [data, setData] = useState<SymbolData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'buys'>('all');
+  const [verdicts, setVerdicts] = useState<Record<string, AIAnalysisResult>>({});
 
   useEffect(() => {
     api.scanMarket().then((res) => {
       setData(res.symbols);
       setLoading(false);
+      onScanReady?.(res.symbols.map((s) => s.symbol));
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (data.length === 0) return;
+    let cancelled = false;
+    const symbols = data.map((s) => s.symbol);
+    const fetchVerdicts = async () => {
+      for (const sym of symbols) {
+        if (cancelled) break;
+        try {
+          const result = await api.getAnalysis(sym);
+          if (!cancelled && result.ai_available) {
+            setVerdicts((prev) => ({ ...prev, [sym]: result }));
+          }
+        } catch {
+          // skip — AI may be unavailable or slow
+        }
+      }
+    };
+    fetchVerdicts();
+    return () => { cancelled = true; };
+  }, [data]);
 
   const displayed = filter === 'buys' ? data.filter((s) => s.signal === 'BUY') : data;
 
@@ -50,6 +83,7 @@ export default function MarketGrid({ onQuickLog, onViewDetail }: { onQuickLog: (
               <th className="text-right p-3 font-medium">ADX</th>
               <th className="text-right p-3 font-medium">Vol</th>
               <th className="text-center p-3 font-medium">Signal</th>
+              <th className="text-center p-3 font-medium">AI</th>
               <th className="text-right p-3 font-medium" />
             </tr>
           </thead>
@@ -77,6 +111,27 @@ export default function MarketGrid({ onQuickLog, onViewDetail }: { onQuickLog: (
                     </span>
                   ) : (
                     <span className="text-dim text-xs">—</span>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  {verdicts[s.symbol] ? (
+                    <button
+                      onClick={() => onViewDetail(s.symbol)}
+                      className="inline-flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity cursor-pointer"
+                      title="View AI Analysis"
+                    >
+                      <span className={`w-2 h-2 rounded-full ${VERDICT_DOT[verdicts[s.symbol].verdict] ?? 'bg-navy-500'}`} />
+                      <span className={
+                        verdicts[s.symbol].verdict === 'BUY' || verdicts[s.symbol].verdict === 'BUY_BACK' ? 'text-green' :
+                        verdicts[s.symbol].verdict === 'SELL' || verdicts[s.symbol].verdict === 'SHORT_SELL' ? 'text-red' :
+                        verdicts[s.symbol].verdict === 'STOP_LOSS' ? 'text-yellow' :
+                        'text-dim'
+                      }>
+                        {verdicts[s.symbol].verdict}
+                      </span>
+                    </button>
+                  ) : (
+                    <span className="text-dim/40 text-xs">—</span>
                   )}
                 </td>
                 <td className="p-3 text-right">

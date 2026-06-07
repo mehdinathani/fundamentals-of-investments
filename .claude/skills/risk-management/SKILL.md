@@ -11,7 +11,35 @@ allowed-tools: Read, Write, Bash
 
 # Risk Management
 
-Capital protection layer for the PSX investment system. Every rule in this skill is NON-NEGOTIABLE unless the user explicitly requests a change with justification.
+## 👤 Who This Is For
+
+**This is the most important skill in the entire system — especially for you as a student.**
+
+Experienced investors (and CA/CFA analysts) know one thing that beginners don't: **you will lose money on some trades. That's normal. What matters is how much you lose when you're wrong.**
+
+A CA analyst manages risk with strict formulas. An old investor manages risk from scar tissue (they've been burned before). You don't have either — so this skill enforces both for you, automatically.
+
+**Statistic to remember:** Most beginner investors don't fail because they picked the wrong stocks. They fail because they:
+1. Risked too much on one trade (overconfidence)
+2. Didn't use stop-losses (hope instead of discipline)
+3. Averaged down on losing positions (turning small losses into account-killers)
+4. Revenge-traded after a loss (emotional spiral)
+
+This skill prevents all four.
+
+## 🧠 Why This Matters — Student vs Pro
+
+| What a CA/pro does | What this skill does for you |
+|---|---|
+| Knows from experience: "Never risk more than X% per trade" | Enforces 3-5% max loss as a hard rule — no exceptions |
+| Calculates position size from risk tolerance in their head | Applies the position sizing formula automatically |
+| Instinctively sets a stop-loss at entry (years of discipline) | Forces stop-loss to be set BEFORE the trade is approved |
+| Has the discipline to never average down (learned from painful losses) | Blocks averaging down — the system refuses |
+| Manages portfolio exposure mentally | Checks position count, sector correlation, and cash reserve automatically |
+
+**The fundamental truth:** A CA analyst and a student can buy the same stock at the same price. The CA survives a 30% drawdown because they sized correctly and used stops. The student blows up because they went all-in and held on hope. **Risk management is the difference.**
+
+---
 
 ## What This Skill Does
 
@@ -49,6 +77,10 @@ Ensure all required context is gathered before implementing.
 
 ### Rule 1: Maximum Loss Per Trade — 3% to 5%
 
+**In plain language:** Before you enter any trade, decide exactly how much money you're willing to lose. Then don't lose more.
+
+Most beginners think about how much they'll make. Professionals think about how much they'll lose.
+
 **This is the system's survival mechanism. Never violate.**
 
 ```
@@ -60,6 +92,8 @@ Maximum loss per trade = Account Balance × Risk Percentage
 | **Conservative** | 3% | Account < PKR 1M, new trader, high volatility stocks |
 | **Standard** | 5% | Account ≥ PKR 1M, experienced, stable large-caps |
 | **NEVER EXCEED** | 5% | Hard ceiling — no exceptions |
+
+**Why 3-5%?** If you lose 5% of your account, you need a 5.3% gain to get back to even. If you lose 50% (common for beginners who go all-in), you need a 100% gain to recover. Small losses are recoverable. Large losses end your trading career.
 
 **Example:**
 - Account: PKR 2,000,000
@@ -76,6 +110,14 @@ def max_loss_per_trade(account_balance, risk_pct=0.05):
 ---
 
 ### Rule 2: Position Sizing Formula
+
+**In plain language:** How many shares should you buy?
+
+Most beginners think: "I have PKR 100,000, this stock costs PKR 50, so I'll buy 2,000 shares."
+
+A CA analyst thinks: "My account is PKR 2,000,000. I can lose 5% = PKR 100,000. The stop-loss is 5% below entry = PKR 5 per share risk. So I can buy 20,000 shares. But wait — that's PKR 1,000,000 invested = 50% of my account. The max position limit is 10%. So I'll buy 4,000 shares for PKR 200,000."
+
+This skill does the CA analyst's math automatically.
 
 Position size is derived from risk, NOT from how much you want to invest.
 
@@ -136,6 +178,10 @@ ADJUSTED: Max 20% = PKR 400,000 → 4,000 shares
 
 ### Rule 3: Stop-Loss Logic
 
+**In plain language:** A stop-loss is your escape hatch. You decide BEFORE entering how much you're willing to lose, and you get out automatically when that limit is hit.
+
+Beginners often hold losing stocks hoping they'll come back. This is the #1 destroyer of trading accounts. Professionals cut losses fast and let winners run.
+
 #### 3A. Initial Stop-Loss (MANDATORY)
 
 ```
@@ -149,6 +195,8 @@ Conservative stop_pct = 3% (0.03)
 - Use intraday low or previous support as reference, minimum is the % rule
 
 #### 3B. Trailing Stop (RECOMMENDED)
+
+**In plain language:** As the stock goes up, your stop-loss should also go up. Lock in profits as they happen.
 
 ```
 After +10% gain: Trail stop to entry price (breakeven)
@@ -256,6 +304,20 @@ def pre_trade_risk_check(account_balance, entry_price, stop_price,
 
     return True, "Approved", planned_shares
 ```
+
+---
+
+---
+
+## 🎯 Takeaway for a Student Investor
+
+**This skill is why the system works.** You can pick mediocre stocks and still make money with good risk management. You can pick great stocks and lose money with bad risk management.
+
+**What the pro does:** Has the discipline to cut losses, size positions correctly, and never revenge-trade — learned from years of painful experience.
+
+**What this skill does:** Enforces the same discipline as hard rules. The system won't let you take oversized positions. It won't let you move your stop-loss down. It won't let you average down.
+
+**The difference:** You get the discipline without the scar tissue. That's your real edge.
 
 ---
 

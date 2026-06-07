@@ -14,3 +14,5 @@ services:
         value: psx2026
       - key: FRONTEND_URL
         value: https://psx-invest.vercel.app
+      - key: PYTHON_VERSION
+        value: 3.11.0

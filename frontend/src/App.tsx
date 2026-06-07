@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import MacroIndicator from './components/MacroIndicator';
 import MarketGrid from './components/MarketGrid';
 import PipelineControls from './components/PipelineControls';
 import PerformanceCard from './components/PerformanceCard';
 import TradeJournal from './components/TradeJournal';
 import SymbolDetail from './components/SymbolDetail';
+import AIScanSummary from './components/AIScanSummary';
 import { BarChart3, Lock } from 'lucide-react';
 import { isAuthed, login } from './api/client';
 
@@ -78,7 +79,12 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [quickLogSymbol, setQuickLogSymbol] = useState<string | null>(null);
   const [detailSymbol, setDetailSymbol] = useState<string | null>(null);
-  const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
+  const [scanSymbols, setScanSymbols] = useState<string[] | null>(null);
+  const scanTriggered = useRef(false);
+  const refresh = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+    scanTriggered.current = true;
+  }, []);
 
   if (!authed) {
     return <LoginForm onLogin={() => setAuthed(true)} />;
@@ -116,7 +122,10 @@ export default function App() {
             <PerformanceCard />
           </div>
           <div className="lg:col-span-3" key={`market-${refreshKey}`}>
-            <MarketGrid onQuickLog={setQuickLogSymbol} onViewDetail={setDetailSymbol} />
+            <MarketGrid onQuickLog={setQuickLogSymbol} onViewDetail={setDetailSymbol} onScanReady={setScanSymbols} />
+          </div>
+          <div className="lg:col-span-1" key={`ai-${refreshKey}`}>
+            <AIScanSummary symbols={scanSymbols ?? undefined} onViewDetail={setDetailSymbol} />
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import type { MacroState, ScanResult, Trade, Performance, PipelineStatus } from '../types';
+import type { MacroState, ScanResult, Trade, Performance, PipelineStatus, ComparisonResult, AIAnalysisResult } from '../types';
 
 // Dev: Vite proxy handles /api -> localhost:8000
 // Production: VITE_API_URL points to the Render backend
@@ -61,6 +61,18 @@ export const api = {
   // Pipeline
   runPipeline: () => fetchJSON<any>('/pipeline/run', { method: 'POST' }),
   getPipelineStatus: () => fetchJSON<PipelineStatus>('/pipeline/status'),
+
+  // Analysis
+  getBenchmarks: (symbol: string) => fetchJSON<ComparisonResult>(`/benchmarks/${symbol}`),
+  getAnalysis: (symbol: string, tier?: string) => {
+    const params = tier ? `?tier=${tier}` : '';
+    return fetchJSON<AIAnalysisResult>(`/analyze/${symbol}${params}`);
+  },
+  scanAnalysis: (symbols?: string[]) =>
+    fetchJSON<{ results: AIAnalysisResult[]; summary: string }>('/analyze/scan', {
+      method: 'POST',
+      body: JSON.stringify({ symbols: symbols ?? null }),
+    }),
 
   // Journal
   getTrades: (symbol?: string) => {
