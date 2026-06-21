@@ -3,7 +3,8 @@ name: ai-decision-analysis
 description: |
   Generate AI-powered decision narratives for PSX stocks by combining fundamental
   ratios, benchmark comparisons, technical evidence, market filter data, and macro
-  context into structured BUY/SELL/HOLD analysis. Uses Gemini 2.0 Flash via the
+  context into a structured BUY/SELL/SHORT_SELL/BUY_BACK/STOP_LOSS/HOLD/IGNORE decision,
+  written in a seasoned-broker-mentoring-a-student voice. Uses Gemini 2.0 Flash via the
   google-genai SDK. This skill should be used when users ask to analyze a stock,
   generate AI reports, run batch scans, or interpret AI verdicts for PSX equities.
 allowed-tools: Read, Write, Bash
@@ -47,9 +48,11 @@ Data Sources → Prompt Builder → Gemini 2.0 Flash → JSON Parser → AIAnaly
 
 The prompt instructs the LLM to act as a CA/ACCA-qualified equity analyst and return **only valid JSON** with no markdown fences or commentary:
 
+**Voice:** the prompt casts the LLM as a *seasoned PSX broker (30 years on the floor) mentoring a finance student* — warm, plain-language, defines jargon inline, always explains *why*. Every narrative field is written in this teaching voice. The model still interprets only the injected ground-truth numbers (never invents them).
+
 ```json
 {
-  "verdict": "BUY|SELL|SHORT_SELL|BUY_BACK|STOP_LOSS|HOLD",
+  "verdict": "BUY|SELL|SHORT_SELL|BUY_BACK|STOP_LOSS|HOLD|IGNORE",
   "confidence": "HIGH|MEDIUM|LOW",
   "time_horizon": "SHORT_TERM|MEDIUM_TERM|LONG_TERM",
   "executive_summary": "2-3 sentence verdict",
@@ -72,9 +75,14 @@ The prompt instructs the LLM to act as a CA/ACCA-qualified equity analyst and re
 
 | Component | File | Purpose |
 |-----------|------|---------|
-| AIReportPanel | `frontend/src/components/AIReportPanel.tsx` | Displays AI verdict card + collapsible sections |
-| BenchmarkChart | `frontend/src/components/BenchmarkChart.tsx` | Horizontal bar: stock value vs medians |
+| AIReportPanel | `frontend/src/components/AIReportPanel.tsx` | Mentor narrative + collapsible sections, headed by VerdictGauge |
+| VerdictGauge | `frontend/src/components/VerdictGauge.tsx` | Semicircular gauge: verdict color + confidence fill |
+| PriceChart | `frontend/src/components/PriceChart.tsx` | Recharts close line + MA20/50/200 + volume (3M/6M/1Y) |
+| SectorHeatmap | `frontend/src/components/SectorHeatmap.tsx` | Colored sector grid; highlights the stock's own sector |
+| RatioRadar | `frontend/src/components/RatioRadar.tsx` | Grouped bars: stock vs sector/KSE30/KSE100/ALLSHR per ratio (auto-extends to new ratios) |
 | AIScanSummary | `frontend/src/components/AIScanSummary.tsx` | Best bets, red flags, sector rotation |
+
+`SymbolDetail.tsx` tabs: **Chart** (PriceChart) · **AI Mentor** (AIReportPanel) · **Benchmarks** (RatioRadar) · **Technical** · **Fundamentals** · **Market** (SectorHeatmap).
 
 ### API Endpoints
 
@@ -83,6 +91,8 @@ The prompt instructs the LLM to act as a CA/ACCA-qualified equity analyst and re
 | GET | `/api/analyze/{symbol}` | Single symbol AI analysis |
 | POST | `/api/analyze/scan` | Batch AI analysis (max 5 symbols) |
 | GET | `/api/benchmarks/{symbol}` | Multi-context comparison data |
+| GET | `/api/market/history/{symbol}?days=N` | OHLC history + MA overlays for the price chart |
+| GET | `/api/market/heatmap` | Sector performance (avg change per sector) |
 
 ### Error Handling
 
@@ -111,3 +121,4 @@ pip install google-genai
 | BUY_BACK | Short position should be covered | Close short, take profit |
 | STOP_LOSS | Stop loss triggered or imminent danger | Exit immediately |
 | HOLD | No clear edge — wait for better setup | No action |
+| IGNORE | Fails Layer 0 market filter (illiquid/manipulated) or not worth attention | Skip — don't waste capital or focus |

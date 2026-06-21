@@ -20,7 +20,21 @@
 | T009 | ✅ Done | 2026-06-07 | POST /api/analyze/scan batch endpoint |
 | T010 | ✅ Done | 2026-06-07 | AIScanSummary.tsx dashboard panel + App integration |
 | T011 | ✅ Done | 2026-06-07 | ai-decision-analysis skill created |
-| T012 | ✅ Done | 2026-06-07 | E2E test script (tests/test_ai_decision_e2e.py) |---
+| T012 | ✅ Done | 2026-06-07 | E2E test script (tests/test_ai_decision_e2e.py) |
+| T013 | ✅ Done | 2026-06-21 | ai_service.py — mentor-voice persona + IGNORE verdict (ground-truth block intact) |
+| T014 | ✅ Done | 2026-06-21 | market.py — GET /api/market/history/{symbol} (OHLC + MA overlays) |
+| T015 | ✅ Done | 2026-06-21 | market.py — GET /api/market/heatmap (sector performance data) |
+| T016 | ✅ Done | 2026-06-21 | types/index.ts + api/client.ts — Candle/Heatmap types, getHistory/getHeatmap |
+| T017 | ✅ Done | 2026-06-21 | PriceChart.tsx — recharts close line + MA20/50/200 + volume |
+| T018 | ✅ Done | 2026-06-21 | SectorHeatmap.tsx — colored sector grid, highlights stock's sector |
+| T019 | ✅ Done | 2026-06-21 | RatioRadar.tsx — grouped bars vs SECTOR/KSE30/KSE100/ALLSHR (auto-extends) |
+| T020 | ✅ Done | 2026-06-21 | VerdictGauge.tsx — semicircular confidence dial, verdict-colored |
+| T021 | ✅ Done | 2026-06-21 | SymbolDetail Chart+Market tabs; RatioRadar replaces BenchmarkChart (deleted) |
+| T022 | ✅ Done | 2026-06-21 | AIReportPanel gauge + IGNORE style; MarketGrid IGNORE dot; Modal size="lg" |
+| T023 | ✅ Done | 2026-06-21 | Synced SKILL.md; added IGNORE + mentor-voice E2E assertions |
+| T024 | ✅ Done | 2026-06-21 | scripts/financial_ratio_parser.py — BS/P&L parser → ROE, D/E, Dividend Yield with parquet caching |
+| T025 | ✅ Done | 2026-06-21 | compute_ratios_for_symbol() + compare_stock_full() emit ROE/DE/DIVIDEND_YIELD (RATIO_FIELDS loop) |
+| T026 | ✅ Done | 2026-06-21 | Stale-data guard (FINANCIALS_CACHE_TTL_DAYS=7) + graceful omission for unavailable statements |
 
 ## Phase 1: Backend — Comparison Layer
 
@@ -117,3 +131,59 @@
 - Full pipeline: market data → benchmarks → AI analysis → frontend display
 - Test with all 5 validation symbols (ENGRO, OGDC, HBL, LUCK, SYS)
 - Verify each AI response has valid verdict, confidence, risk factors, action plan
+
+---
+
+## Phase 5: Differentiation Pass — "broker teaching a student" ✅ (2026-06-21)
+
+**Purpose**: Turn the click-through view from raw ratios into the differentiated experience —
+mentor-voice narrative, IGNORE verdict, and four on-screen visuals. Maps to spec US1 (benchmark
+comparison), US2 (AI narrative), US3 (decision dashboard visuals). All tasks shipped; see PHR 004.
+
+**Independent test**: Click any symbol → Chart tab shows price + MAs + volume; Market tab shows
+sector heatmap with the stock's sector highlighted; Benchmarks tab shows grouped bars vs all 4
+indices; AI Mentor tab opens with a confidence gauge and a plain-language broker explanation;
+an illiquid symbol returns IGNORE.
+
+- [x] T013 [US2] Add IGNORE to `VERDICTS` and rewrite `build_prompt()` persona to seasoned-broker-mentoring-a-student voice (jargon defined inline, ground-truth block + JSON schema unchanged) in `backend/services/ai_service.py`
+- [x] T014 [P] [US3] Add `GET /api/market/history/{symbol}?days=N` (reuse `get_historical_data` + `compute_indicators` for MA20/50/200) in `backend/routers/market.py`
+- [x] T015 [P] [US3] Add `GET /api/market/heatmap` (reuse sector grouping from `heatmap_tradebars`, return data not print) in `backend/routers/market.py`
+- [x] T016 [US3] Add `Candle`/`HistoryResponse`/`HeatmapSector`/`HeatmapResponse` types + IGNORE to verdict union in `frontend/src/types/index.ts`; add `getHistory`/`getHeatmap` in `frontend/src/api/client.ts`
+- [x] T017 [P] [US3] Build price chart (recharts ComposedChart: close + MA20/50/200 + volume, 3M/6M/1Y toggle) in `frontend/src/components/PriceChart.tsx`
+- [x] T018 [P] [US3] Build sector heatmap (colored grid, highlights stock's own sector) in `frontend/src/components/SectorHeatmap.tsx`
+- [x] T019 [P] [US1] Build multi-ratio benchmark visual (grouped bars vs SECTOR/KSE30/KSE100/ALLSHR; maps over `benchmarks.ratios` so it auto-extends) in `frontend/src/components/RatioRadar.tsx`
+- [x] T020 [P] [US2] Build verdict/confidence gauge (semicircular SVG dial, verdict-colored incl. IGNORE) in `frontend/src/components/VerdictGauge.tsx`
+- [x] T021 [US3] Add Chart + Market tabs (Chart default), swap `BenchmarkChart` for `RatioRadar`, delete orphaned `BenchmarkChart.tsx` in `frontend/src/components/SymbolDetail.tsx`
+- [x] T022 [US2] Mount `VerdictGauge` + add IGNORE style in `frontend/src/components/AIReportPanel.tsx`; add IGNORE dot in `frontend/src/components/MarketGrid.tsx`; add `size="lg"` + scroll in `frontend/src/components/Modal.tsx`
+- [x] T023 [US2] Sync verdict set/voice/components/endpoints in `.claude/skills/ai-decision-analysis/SKILL.md`; add IGNORE + mentor-voice assertions in `tests/test_ai_decision_e2e.py`
+
+**Checkpoint**: ✅ `npm run build` + `tsc -b` clean; parser/VERDICTS/prompt verified offline. recharts (prev. unused) now drives all charts.
+
+---
+
+## Phase 6: Extended Ratio Parser ✅ (2026-06-21)
+
+**Purpose**: Compute ROE / Debt-to-Equity / Dividend-Yield so the benchmark visual fills out.
+`RatioRadar` already maps over all ratios, so no frontend change was needed. Parser caches to
+parquet (7-day TTL) following constitution data-quality rules.
+
+- [x] T024 [US1] Build PSX financial-statement parser (balance sheet + P&L → ROE, D/E, Dividend Yield) with parquet caching, following `financial-ratios-psx` skill formulas, in `scripts/financial_ratio_parser.py`
+- [x] T025 [US1] Extend `compute_ratios_for_symbol()` / `compare_stock_full()` to emit ROE/DE/DIVIDEND_YIELD comparisons in `scripts/ratio_calculator.py` + `backend/services/compare_service.py`
+- [x] T026 [US1] Add stale-data guard + graceful omission when statements unavailable (no invented values) across the new parser path
+
+**Checkpoint**: `GET /api/benchmarks/ENGRO` returns ROE/DE/Dividend alongside P/E & EPS; RatioRadar renders all five with no frontend edit.
+
+---
+
+## Dependencies & Story Mapping
+
+- **US1 (Benchmark comparison)**: T001-T003 ✅ + T019 ✅ (visual) → T024-T026 ⏸ (more ratios)
+- **US2 (AI narrative)**: T004-T005, T007 ✅ + T013, T020, T022, T023 ✅ (mentor voice, gauge, IGNORE)
+- **US3 (Decision dashboard)**: T006, T008 ✅ + T014-T018, T021 ✅ (chart, heatmap, tabs)
+- **US4 (Batch scan)**: T009-T010 ✅ (unchanged this pass)
+- Phase 6 (T024-T026) is independent and blocks nothing already shipped.
+
+## Parallel Execution (Phase 5, as built)
+- Backend T014 ‖ T015 (same file, distinct endpoints — independent logic)
+- Frontend T017 ‖ T018 ‖ T019 ‖ T020 (four separate component files, no shared state)
+- T013 (prompt) independent of all frontend tasks

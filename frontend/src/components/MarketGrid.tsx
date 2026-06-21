@@ -10,6 +10,7 @@ const VERDICT_DOT: Record<string, string> = {
   BUY_BACK: 'bg-green',
   STOP_LOSS: 'bg-yellow',
   HOLD: 'bg-navy-500',
+  IGNORE: 'bg-navy-600',
 };
 
 export default function MarketGrid({ onQuickLog, onViewDetail, onScanReady }: { onQuickLog: (symbol: string) => void; onViewDetail: (symbol: string) => void; onScanReady?: (symbols: string[]) => void }) {

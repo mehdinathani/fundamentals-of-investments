@@ -1,14 +1,20 @@
 # AI Decision Intelligence — Architecture Plan
 
+> **Status (2026-06-21):** All phases complete (Phase 1–6). The differentiated
+> click-through experience and extended ratio parser are live. See
+> `history/prompts/ai-decision-intelligence/004-mentor-voice-visuals-ignore.green.prompt.md`.
+> Sections below are annotated with ✅ (built).
+
 ## 1. Scope & Dependencies
 
 ### In Scope
-- Multi-context benchmark comparison (sector, KSE30, KSE100, ALLSHR)
-- AI-powered descriptive analysis for each stock
-- 5-action decision framework: BUY / SELL / SHORT SELL / BUY BACK / STOP LOSS / HOLD
-- Frontend AI report panel with confidence meter, action plan, risk factors
-- Batch AI analysis for full pipeline scan
-- Caching layer to manage API costs
+- Multi-context benchmark comparison (sector, KSE30, KSE100, ALLSHR) ✅
+- AI-powered descriptive analysis for each stock, in a **seasoned-broker-mentoring-a-student voice** ✅
+- 7-action decision framework: BUY / SELL / SHORT SELL / BUY BACK / STOP LOSS / HOLD / **IGNORE** ✅
+- On-screen visuals on stock click: **price chart (close + MA20/50/200 + volume)**, **sector heatmap**, **multi-ratio benchmark chart**, **verdict/confidence gauge** ✅
+- Frontend AI report panel with confidence gauge, action plan, risk factors ✅
+- Batch AI analysis for full pipeline scan ✅
+- Caching layer to manage API costs ✅
 
 ### Out of Scope (v1)
 - Real-time streaming AI responses
@@ -55,6 +61,21 @@ Body: { symbols?: string[], tier?: string }
 Response: { results: AIAnalysisResult[], summary: string }
 ```
 
+### `GET /api/market/history/{symbol}` ✅ (NEW)
+```
+Query params: days (default 180, 20–2000)
+Response: { symbol, candles: [{date, open, high, low, close, volume, ma20, ma50, ma200}] }
+Source: scripts.psx_data.get_historical_data + signal_service.compute_indicators
+Powers: PriceChart.tsx
+```
+
+### `GET /api/market/heatmap` ✅ (NEW)
+```
+Response: { sectors: [{code, name, avg_change_pct, stock_count, total_volume}] }
+Source: get_market_watch grouped by SECTOR (logic reused from heatmap_tradebars)
+Powers: SectorHeatmap.tsx
+```
+
 ## 4. Non-Functional Requirements
 
 | Aspect | Target |
@@ -89,10 +110,17 @@ User clicks "Analyze ENGRO"
 
 ## 6. AI Prompt Architecture
 
+> **Implemented voice (2026-06-21):** persona is a *seasoned PSX broker (30 years
+> on the floor) mentoring a finance student* — warm, plain-language, defines jargon
+> inline, always explains *why*. The ground-truth number block and JSON schema are
+> unchanged (anti-hallucination guard preserved); the tone lives inside the string
+> fields. See `backend/services/ai_service.py:build_prompt`.
+
 The prompt follows a strict template:
 
 ```
-You are a CA/ACCA-level equity analyst analyzing {SYMBOL} on the Pakistan Stock Exchange.
+You are a seasoned PSX broker with 30 years on the floor, mentoring a finance student on {SYMBOL}.
+(Define jargon inline; always explain WHY. Interpret only the numbers below — never invent them.)
 
 ## Data Provided (ground truth, do not alter):
 Price: {PRICE}
@@ -108,9 +136,9 @@ Macro Regime: {MACRO_STATE}
 ### Market Filter:
 {liquidity/operator verdict}
 
-## Output Format — Return valid JSON only:
+## Output Format — Return valid JSON only (write every text field in the mentoring voice):
 {
-  "verdict": "BUY|SELL|SHORT_SELL|BUY_BACK|STOP_LOSS|HOLD",
+  "verdict": "BUY|SELL|SHORT_SELL|BUY_BACK|STOP_LOSS|HOLD|IGNORE",
   "confidence": "HIGH|MEDIUM|LOW",
   "time_horizon": "...",
   "executive_summary": "2-3 sentences",
@@ -150,6 +178,27 @@ Week 2:
   T013 — End-to-end testing
 ```
 
+### 7.1 Differentiation pass (2026-06-21) ✅ — "broker teaching a student"
+
+### 7.2 Extended ratio parser (2026-06-21) ✅
+
+```
+DIFF-1 — ai_service.py: mentor-voice persona + IGNORE verdict (ground-truth block intact)
+DIFF-2 — market.py: GET /api/market/history/{symbol}  (OHLC + MA overlays)
+DIFF-3 — market.py: GET /api/market/heatmap           (sector performance data)
+DIFF-4 — types/index.ts + api/client.ts: Candle/Heatmap types, getHistory/getHeatmap
+DIFF-5 — PriceChart.tsx        (recharts ComposedChart: close + MA20/50/200 + volume)
+DIFF-6 — SectorHeatmap.tsx     (colored sector grid, highlights stock's own sector)
+DIFF-7 — RatioRadar.tsx        (grouped bars vs SECTOR/KSE30/KSE100/ALLSHR; auto-extends)
+DIFF-8 — VerdictGauge.tsx      (semicircular confidence dial, verdict-colored)
+DIFF-9 — SymbolDetail.tsx: Chart + Market tabs; RatioRadar replaces BenchmarkChart (deleted)
+DIFF-10 — AIReportPanel (gauge + IGNORE style), MarketGrid (IGNORE dot), Modal (size="lg")
+DIFF-11 — sync ai-decision-analysis SKILL.md; add IGNORE + mentor-voice E2E assertions
+```
+
+Verification: `frontend` `npm run build` + `tsc -b` clean; backend parser/VERDICTS/prompt
+asserted offline (live-network E2E hangs in sandbox). recharts (installed, prev. unused) now drives all charts.
+
 ## 8. Risk Mitigation
 
 | Risk | Mitigation |
@@ -158,3 +207,5 @@ Week 2:
 | API down/slow | Rule-based fallback: "AI analysis unavailable. Technical: {signal}. Fundamentals: {comparison summary}." |
 | Cost overruns | Cache aggressively; use Gemini 2.0 Flash (free tier); batch analysis processes sequentially with max 10 per request |
 | Student misinterpretation | Add disclaimer: "AI-generated analysis is educational. Verify before trading." |
+| Mentor tone drift (too casual / jargon-heavy) | temperature 0.1 + explicit "define jargon inline" instruction; spot-check 2-3 symbols. AI stays advisory — human is final decision-maker (constitution) |
+| Chart/heatmap data stale | history is cached parquet (≤30d), market-watch is live; reuse existing stale-data warning pattern when surfacing |

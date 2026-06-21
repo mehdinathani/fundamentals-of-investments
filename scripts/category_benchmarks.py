@@ -15,6 +15,9 @@ from scripts.psx_data import (
     get_market_watch, get_company_info, _request,
     DPS_BASE_URL, DPS_HEADERS,
 )
+from scripts.financial_ratio_parser import (
+    compute_ratios_for_symbol_financial,
+)
 
 BENCHMARKS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -89,9 +92,15 @@ def compute_ratios_for_symbol(symbol, mw_df):
     fin = _get_eps_from_company_page(symbol)
     eps = fin.get("eps")
     pe = (price / eps) if (price and eps and eps > 0) else None
+
+    fin_data = compute_ratios_for_symbol_financial(symbol, price)
+
     return {
         "EPS": eps,
         "PE": round(pe, 2) if pe else None,
+        "ROE": fin_data.get("ROE"),
+        "DE": fin_data.get("DE"),
+        "DIVIDEND_YIELD": fin_data.get("DIVIDEND_YIELD"),
         "PRICE": price,
     }
 
@@ -110,10 +119,11 @@ def compute_index_medians(symbols, mw_df, index_name):
         time.sleep(random.uniform(2.0, 3.0))
     df = pd.DataFrame(ratios_list)
     medians = {}
-    for field in ["PE", "EPS"]:
-        vals = df[field].dropna()
-        medians[field] = round(vals.median(), 2) if not vals.empty else None
-        medians[f"{field}_count"] = len(vals)
+    for field in RATIO_FIELDS:
+        if field in df.columns:
+            vals = df[field].dropna()
+            medians[field] = round(vals.median(), 2) if not vals.empty else None
+            medians[f"{field}_count"] = len(vals)
     medians["total_symbols"] = total
     return medians
 
@@ -127,8 +137,10 @@ def update_benchmarks():
         path = BENCHMARKS_DIR / f"{idx_name.lower()}_ratios_latest.csv"
         pd.DataFrame([medians]).to_csv(path, index=False)
         print(f"  Saved to {path}")
-        print(f"  Median P/E: {medians.get('PE', 'N/A')} (n={medians.get('PE_count', 0)})")
-        print(f"  Median EPS: {medians.get('EPS', 'N/A')} (n={medians.get('EPS_count', 0)})")
+        for field in RATIO_FIELDS:
+            val = medians.get(field, 'N/A')
+            cnt = medians.get(f'{field}_count', 0)
+            print(f"  Median {RATIO_DESCRIPTIONS.get(field, field)}: {val} (n={cnt})")
     print("\nBenchmarks updated.")
 
 def load_benchmarks():
@@ -153,10 +165,14 @@ if __name__ == "__main__":
     if args.show or not args.update:
         benchmarks = load_benchmarks()
         print("\nCurrent Benchmarks:")
-        print(f"{'Index':<10} {'P/E':<10} {'EPS':<10}")
-        print("-" * 30)
+        header = f"{'Index':<10}"
+        for field in RATIO_FIELDS:
+            header += f" {RATIO_DESCRIPTIONS.get(field, field):<20}"
+        print(header)
+        print("-" * (10 + 20 * len(RATIO_FIELDS)))
         for idx in ["KSE30", "KSE100", "ALLSHR"]:
             b = benchmarks.get(idx, {})
-            pe = b.get("PE", "N/A")
-            eps = b.get("EPS", "N/A")
-            print(f"{idx:<10} {str(pe):<10} {str(eps):<10}")
+            line = f"{idx:<10}"
+            for field in RATIO_FIELDS:
+                line += f" {str(b.get(field, 'N/A')):<20}"
+            print(line)

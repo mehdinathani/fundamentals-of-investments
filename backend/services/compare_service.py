@@ -6,6 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from scripts.ratio_calculator import compare_stock, compute_ratios_for_symbol
 from backend.services.sector_service import get_sector, get_sector_peers, get_sector_median
 from scripts.psx_data import get_market_watch
+from scripts.macros import RATIO_FIELDS
 
 
 def _compute_percentile_rank(symbol: str, ratio_field: str, stock_val: float, mw_df: pd.DataFrame) -> float | None:
@@ -42,7 +43,7 @@ def compare_stock_full(symbol: str, mw_df: pd.DataFrame | None = None) -> dict:
         "ratios": {},
     }
 
-    for ratio_field in ["PE", "EPS"]:
+    for ratio_field in RATIO_FIELDS:
         ratio_data = base.get("ratios", {}).get(ratio_field)
         if not ratio_data:
             continue

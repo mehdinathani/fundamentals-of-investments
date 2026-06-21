@@ -109,6 +109,8 @@ def test_prompt_builder(symbol: str):
     check("prompt contains verdict instructions", "verdict" in prompt)
     check("prompt contains JSON output spec", "{" in prompt)
     check("prompt contains GROUND TRUTH", "GROUND TRUTH" in prompt)
+    check("prompt offers IGNORE verdict", "IGNORE" in prompt)
+    check("prompt uses mentor/student voice", "student" in prompt.lower())
 
 
 def test_parse_response():
@@ -135,6 +137,10 @@ def test_parse_response():
     invalid_verdict = valid.replace("BUY", "MOON")
     parsed2 = parse_response(invalid_verdict)
     check("invalid verdict is rejected", parsed2 is None)
+
+    ignore_verdict = valid.replace('"verdict": "BUY"', '"verdict": "IGNORE"')
+    parsed_ignore = parse_response(ignore_verdict)
+    check("IGNORE verdict accepted", parsed_ignore is not None and parsed_ignore["verdict"] == "IGNORE")
 
     with_fences = f"```json\n{valid}\n```"
     parsed3 = parse_response(with_fences)

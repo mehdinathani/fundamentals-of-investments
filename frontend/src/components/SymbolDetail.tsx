@@ -2,17 +2,19 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import type { SymbolDetail as SymbolDetailType, ComparisonResult, AIAnalysisResult } from '../types';
 import Modal from './Modal';
-import BenchmarkChart from './BenchmarkChart';
 import AIReportPanel from './AIReportPanel';
+import PriceChart from './PriceChart';
+import SectorHeatmap from './SectorHeatmap';
+import RatioRadar from './RatioRadar';
 
-type Tab = 'technical' | 'fundamentals' | 'ai' | 'benchmarks';
+type Tab = 'chart' | 'technical' | 'fundamentals' | 'ai' | 'benchmarks' | 'market';
 
 export default function SymbolDetail({ symbol, onClose }: { symbol: string; onClose: () => void }) {
   const [data, setData] = useState<SymbolDetailType | null>(null);
   const [benchmarks, setBenchmarks] = useState<ComparisonResult | null>(null);
   const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>('technical');
+  const [tab, setTab] = useState<Tab>('chart');
 
   useEffect(() => {
     Promise.all([
@@ -28,14 +30,16 @@ export default function SymbolDetail({ symbol, onClose }: { symbol: string; onCl
   }, [symbol]);
 
   const tabs: { key: Tab; label: string }[] = [
+    { key: 'chart', label: 'Chart' },
+    { key: 'ai', label: 'AI Mentor' },
+    { key: 'benchmarks', label: 'Benchmarks' },
     { key: 'technical', label: 'Technical' },
     ...(data?.macro ? [{ key: 'fundamentals' as Tab, label: 'Fundamentals' }] : []),
-    { key: 'ai', label: 'AI Analysis' },
-    { key: 'benchmarks', label: 'Benchmarks' },
+    { key: 'market', label: 'Market' },
   ];
 
   return (
-    <Modal open={true} onClose={onClose} title={symbol}>
+    <Modal open={true} onClose={onClose} title={symbol} size="lg">
       {loading ? (
         <p className="text-dim text-sm py-4 text-center">Loading...</p>
       ) : (
@@ -55,6 +59,10 @@ export default function SymbolDetail({ symbol, onClose }: { symbol: string; onCl
               </button>
             ))}
           </div>
+
+          {tab === 'chart' && (
+            <PriceChart symbol={symbol} />
+          )}
 
           {tab === 'technical' && data && (
             <div className="space-y-3 text-sm">
@@ -165,13 +173,12 @@ export default function SymbolDetail({ symbol, onClose }: { symbol: string; onCl
                   <span>| Peers: {benchmarks.sector_peers.join(', ')}</span>
                 )}
               </div>
-              {benchmarks.ratios.PE && (
-                <BenchmarkChart label="Price-to-Earnings (P/E)" ratio={benchmarks.ratios.PE} />
-              )}
-              {benchmarks.ratios.EPS && (
-                <BenchmarkChart label="Earnings Per Share (EPS)" ratio={benchmarks.ratios.EPS} />
-              )}
+              <RatioRadar ratios={benchmarks.ratios} />
             </div>
+          )}
+
+          {tab === 'market' && (
+            <SectorHeatmap highlightSector={benchmarks?.sector} />
           )}
         </div>
       )}

@@ -43,7 +43,7 @@ def compare_stock(symbol, price=None, mw_df=None):
         "price": ratios.get("PRICE"),
         "ratios": {},
     }
-    for ratio_field in ["PE", "EPS"]:
+    for ratio_field in RATIO_FIELDS:
         stock_val = ratios.get(ratio_field)
         comparisons = {}
         for idx_name in ["KSE30", "KSE100", "ALLSHR"]:

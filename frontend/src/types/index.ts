@@ -108,9 +108,38 @@ export interface AIActionPlan {
   position_sizing: string;
 }
 
+export interface Candle {
+  date: string;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  close: number | null;
+  volume: number | null;
+  ma20: number | null;
+  ma50: number | null;
+  ma200: number | null;
+}
+
+export interface HistoryResponse {
+  symbol: string;
+  candles: Candle[];
+}
+
+export interface HeatmapSector {
+  code: string;
+  name: string;
+  avg_change_pct: number;
+  stock_count: number;
+  total_volume: number;
+}
+
+export interface HeatmapResponse {
+  sectors: HeatmapSector[];
+}
+
 export interface AIAnalysisResult {
   symbol: string;
-  verdict: 'BUY' | 'SELL' | 'SHORT_SELL' | 'BUY_BACK' | 'STOP_LOSS' | 'HOLD';
+  verdict: 'BUY' | 'SELL' | 'SHORT_SELL' | 'BUY_BACK' | 'STOP_LOSS' | 'HOLD' | 'IGNORE';
   confidence: 'HIGH' | 'MEDIUM' | 'LOW';
   time_horizon: string;
   executive_summary: string;

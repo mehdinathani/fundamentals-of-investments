@@ -1,4 +1,4 @@
-import type { MacroState, ScanResult, Trade, Performance, PipelineStatus, ComparisonResult, AIAnalysisResult } from '../types';
+import type { MacroState, ScanResult, Trade, Performance, PipelineStatus, ComparisonResult, AIAnalysisResult, HistoryResponse, HeatmapResponse } from '../types';
 
 // Dev: Vite proxy handles /api -> localhost:8000
 // Production: VITE_API_URL points to the Render backend
@@ -53,6 +53,11 @@ export const api = {
     return fetchJSON<ScanResult>(`/market/scan${params}`);
   },
   getSymbol: (symbol: string) => fetchJSON<any>(`/market/symbol/${symbol}`),
+  getHistory: (symbol: string, days?: number) => {
+    const params = days ? `?days=${days}` : '';
+    return fetchJSON<HistoryResponse>(`/market/history/${symbol}${params}`);
+  },
+  getHeatmap: () => fetchJSON<HeatmapResponse>('/market/heatmap'),
 
   // Macro
   getMacroState: () => fetchJSON<MacroState>('/macro/state'),

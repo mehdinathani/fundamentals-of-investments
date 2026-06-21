@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AIAnalysisResult } from '../types';
 import { ChevronDown, ChevronRight, AlertTriangle, Target, TrendingUp, BarChart3, Globe } from 'lucide-react';
+import VerdictGauge from './VerdictGauge';
 
 interface Props {
   analysis: AIAnalysisResult;
@@ -13,6 +14,7 @@ const VERDICT_STYLES: Record<string, { bg: string; border: string; text: string;
   BUY_BACK: { bg: 'bg-green-900/30', border: 'border-green/40', text: 'text-green', label: 'BUY BACK' },
   STOP_LOSS: { bg: 'bg-yellow-900/30', border: 'border-yellow/40', text: 'text-yellow', label: 'STOP LOSS' },
   HOLD: { bg: 'bg-navy-700', border: 'border-navy-500', text: 'text-dim', label: 'HOLD' },
+  IGNORE: { bg: 'bg-navy-900', border: 'border-navy-700', text: 'text-dim', label: 'IGNORE' },
 };
 
 function Section({ title, icon, children, defaultOpen }: { title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -44,13 +46,9 @@ export default function AIReportPanel({ analysis }: Props) {
         </div>
       )}
 
-      <div className={`${vs.bg} ${vs.border} border rounded-lg p-4 text-center`}>
-        <div className={`text-lg font-bold ${vs.text} tracking-wider`}>{vs.label}</div>
-        <div className="flex items-center justify-center gap-1.5 mt-2">
-          <div className="text-[10px] text-dim uppercase tracking-wider">Confidence</div>
-          <div className="text-[10px] font-medium text-dim">{analysis.confidence}</div>
-        </div>
-        <div className="text-[10px] text-dim mt-1">{analysis.time_horizon}</div>
+      <div className={`${vs.bg} ${vs.border} border rounded-lg p-4`}>
+        <VerdictGauge verdict={analysis.verdict} confidence={analysis.confidence} />
+        <div className="text-[10px] text-dim text-center mt-1">{analysis.time_horizon}</div>
       </div>
 
       <div className="text-sm text-white/90 px-1">{analysis.executive_summary}</div>
