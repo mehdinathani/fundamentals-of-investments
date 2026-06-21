@@ -1,55 +1,285 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report (2026-05-06):
+  Version change: 1.0.0 → 2.0.0 (MAJOR — system-level redefinition)
+  Bump rationale:
+    research.md §15 (added 2026-05-05) introduced 14 validation gaps that the
+    v1.0.0 constitution does not encode. The application this constitution
+    governs is no longer "discipline + a fixed trade-rules set"; it is a
+    layered system with explicit pre-deployment gates, an unresolved edge
+    statement, a falsifiable kill-switch, a macro overlay, a regime-shift
+    protocol, and tax-aware exit logic. Adding two new principles AND
+    reframing the v1.0.0 trading rules as "starting hypothesis" (not
+    validated edge) crosses the MAJOR threshold per the v1.0.0 governance
+    rules: principles redefined, scope of the system redrawn.
+  Modified principles:
+    I.   Strategy Over Tools                    → kept (no change)
+    II.  Finance-First, Technology Second       → kept (no change)
+    III. Risk Control Over Profit               → kept, sharpened (position-math
+                                                   conflict noted; defers to ADR)
+    IV.  Discipline Over Intelligence           → kept, sharpened (rules now
+                                                   labeled "starting hypothesis,
+                                                   not validated edge")
+    V.   Data-Driven Decisions Only             → kept (no change)
+    VI.  Consistent, Repeatable Process         → renamed → "Layered, Repeatable
+                                                   Process"; expanded to include
+                                                   Macro Overlay layer
+    VII. Named, Defensible Edge                 → NEW (§15.1)
+    VIII.Falsifiable Operation                  → NEW (§15.7)
+  Added sections:
+    - Pre-Deployment Gates (NEW)
+    - Macro Overlay (NEW, §15.9)
+    - Sector Rotation (NEW, §15.10)
+    - Regime-Shift Protocol (NEW, §15.14)
+    - Phase Gating (NEW, §8 + §15.12)
+  Folded (not removed):
+    - v1.0.0 Trading Rules (entry/exit/prohibited) preserved verbatim under
+      "Trading Rules (Hypothesis Status, Not Validated)". Their authority
+      changes: they are now a starting hypothesis pending Phase 1 backtest,
+      not the validated system.
+  Templates checked (per sp.constitution.md §4 propagation):
+    ✅ .specify/templates/plan-template.md
+       — Constitution Check gate is generic ("[Gates determined based on
+         constitution file]"); reads this constitution at plan time. No edit.
+    ✅ .specify/templates/spec-template.md
+       — No constitution-specific sections; no edit.
+    ✅ .specify/templates/tasks-template.md
+       — Organized by user-story independence, not principles; no edit.
+    ✅ .specify/templates/phr-template.prompt.md
+       — Metadata template; no edit.
+    ✅ .claude/commands/sp.constitution.md
+       — References constitution.md generically; no edit.
+  Deferred TODOs (each MUST be resolved by ADR before live capital):
+    - ✅ BACKTEST_GATE                   — §15.2 — resolved (ADR-004) conditional edge with PSX-adapted thresholds
+    - TODO(EDGE_DEFINITION)              — §15.1 — name the edge in one sentence
+    - TODO(POSITION_MATH_RECONCILIATION) — §15.4 — choose 3-4 positions @20% OR
+                                                   7 positions @10% with ≥30% cash
+    - TODO(CGT_EXIT_POLICY)              — §15.6 — tax-aware vs tax-agnostic exits
+    - TODO(FALSIFICATION_NUMBERS)        — §15.7 — exact N, T, Sharpe-floor, KSE-100 gap
+    - ✅ MACRO_OVERLAY_RULES              — §15.9 — resolved (ADR-003); analysis in research.md §17
+    - TODO(REGIME_SHIFT_THRESHOLDS)      — §15.14 — exact stop-cluster trigger
+  Cross-references:
+    - history/adr/ADR-001-psx-skills-architecture.md      (Layer architecture)
+    - history/adr/ADR-002-pre-deployment-strategy-decisions.md (Pre-deployment gates)
+-->
+
+# PSX Investment System Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Strategy Over Tools
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Every feature MUST start from a financial strategy. Technology supports execution; it does not drive decisions. AI enhances efficiency, not intelligence. Code is written to serve the trading system, not the other way around.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Finance-First, Technology Second
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Strategy defines success. Technical implementation MUST NEVER override financial logic. When a financial rule and a technical convenience conflict, the financial rule wins. "Quick technical fixes" that violate trading discipline are prohibited.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Risk Control Over Profit
 
-### [PRINCIPLE_6_NAME]
+Capital preservation is the primary objective. Per-trade max loss MUST stay within 3-5%. No single position MAY exceed the limit set by the position-math reconciliation (see Pre-Deployment Gates). Emotional averaging down, moving stop-loss down, and revenge trading are STRICTLY FORBIDDEN. Risk rules are system safeguards — they are never optional.
 
+**Note:** v1.0.0 stated "max 20% per position." research.md §15.4 surfaced a
+conflict with the ≥30% cash reserve requirement. **Resolved by ADR-002 D4: ≤10% per position, max 7 concurrent positions, ≥30% cash reserve.**
 
-[PRINCIPLE__DESCRIPTION]
+### IV. Discipline Over Intelligence
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rules are followed exactly as documented. The trade-rules-engine MA periods (20/50/200), RSI thresholds (30/70), and volume confirmation (≥120%) MUST NEVER be invented or modified without explicit user consent and ADR documentation. Consistency beats cleverness.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+**Status (2026-05-06):** these specific rules are a **starting hypothesis** per
+research.md §15.2, not a validated edge. They MUST pass the Phase 1 backtest
+gate (see Pre-Deployment Gates) before any live capital is deployed against
+them.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### V. Data-Driven Decisions Only
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+No news chasing. No random indicators. No blind AI predictions. Every buy/sell decision MUST be traceable to: (1) Market Reality Filter pass, (2) Fundamental screen pass, (3) Macro overlay check, (4) Technical signal with volume confirmation, (5) Risk check. If data is missing or unreliable, the system MUST NOT trade.
+
+### VI. Layered, Repeatable Process
+
+The system is a decision engine, not a prediction machine. Every trade MUST follow the same layered architecture (see Layered Architecture section). Skipping a layer is prohibited. Zero signals over a given week is a **correct outcome**, not a failure mode (per research.md §15.5) — forced trades during dry periods are the historical #1 destroyer of disciplined systems and are STRICTLY FORBIDDEN.
+
+### VII. Named, Defensible Edge (NEW — §15.1)
+
+The system MUST state, in one concrete sentence, **why it makes money on PSX** that other participants don't or can't replicate (structural, informational, behavioral, or time-horizon asymmetry). Discipline + finance knowledge + programming is necessary but not sufficient — many participants have all three and still lose.
+
+**Status:** ✅ Resolved (ADR-002 D1). *"I make money on PSX by holding fundamentally strong, liquid names through multi-quarter trends (time-horizon asymmetry), while systematically avoiding manipulated and illiquid stocks via the Layer 0 filter (behavioral discipline)."*
+
+### VIII. Falsifiable Operation (NEW — §15.7)
+
+The system MUST have a pre-committed, written kill-switch: an exact sample size N, time window T, performance floor (Sharpe), and benchmark gap (vs. KSE-100) that, if breached, triggers a full stop and re-evaluation. "If not profitable → STOP" is not specific enough; without numbers, every result can be rationalized.
+
+**Status:** ✅ Resolved (ADR-002 D5). Exact kill-switch: after **N ≥ 50 closed trades over ≥ 6 months**, if **Sharpe < 0.5** OR **underperform KSE-100 by > 5%** net of costs OR **drawdown > 15%** from peak at any point OR **12-month net returns underperform PKR T-bills** → full stop and re-evaluation.
+
+## Layered Architecture (Non-Negotiable)
+
+Every trade decision MUST traverse these layers in order. Skipping or reordering layers is prohibited.
+
+- **Layer 0 — Market Reality Filter** (research.md §4.0): reject illiquid, manipulated, or operator-driven stocks. Liquidity ≥ 50K avg volume, spread < 2%.
+- **Layer 1 — Fundamental Screen** (research.md §4.1): revenue growth, profit growth, earnings consistency, debt levels, sector momentum. Sector-relative thresholds (per §15.3).
+- **Layer 1.5 — Macro Overlay (NEW, §15.9):** SBP policy stance, USD/PKR trend, IMF program status, KSE-100 P/E vs. 10-year median. When macro signals "risk-off," the universe MUST tighten to defensives or cash.
+- **Layer 2 — Technical Signals** (research.md §4.2): trend, breakouts, support/resistance, volume confirmation. No volume → no trade. No trend → no entry.
+- **Layer 3 — Risk & Position Sizing** (research.md §4.3): max loss 3-5% per trade, position cap ≤10% (max 7 concurrent), hard stops, no emotional averaging, macro-factor concentration limit (see §15.8 below).
+- **Layer 4 — Trade Journal & Falsification:** every trade logged with attribution; CAGR, win/loss, max drawdown, Sharpe computed; falsification kill-switch checked against ADR-002 D5 (50 trades/6mo, Sharpe<0.5, KSE-100>5%, dd>15%, T-bills).
+
+## Trading Rules (Hypothesis Status, Not Validated)
+
+These rules are inherited verbatim from constitution v1.0.0. Their **authority is provisional** pending the Phase 1 backtest gate. They MUST NOT be treated as the validated edge until that gate passes.
+
+### Entry Rules
+
+- 20-day SMA MUST cross ABOVE 50-day SMA (golden cross)
+- Price MUST be ABOVE 200-day SMA (long-term uptrend)
+- RSI(14) between 30-60 (or crossing above 30)
+- Volume ≥ 120% of 30-day average (MANDATORY)
+- Stock MUST pass Market Reality Filter (Layer 0)
+- Sector MUST NOT be in bottom-quartile sector momentum (see Sector Rotation)
+- Macro overlay MUST be risk-on or neutral (Layer 1.5)
+- No earnings event within blackout window (see Risk & Capital Rules)
+
+### Exit Rules
+
+- Stop-loss at 5% below entry (3% for conservative)
+- Trail stop to breakeven after +10% gain
+- Trail stop to +5% after +15% gain
+- RSI > 70 with MA sell signal = exit
+- 20-day SMA crosses BELOW 50-day SMA = exit
+- CGT-aware adjustment per ADR-002 D7 (soft tax-aware deferral)
+
+### Prohibited Trading Behaviors
+
+- Emotional averaging down (STRICTLY FORBIDDEN)
+- Moving stop-loss down (STRICTLY FORBIDDEN)
+- Trading without volume confirmation (STRICTLY FORBIDDEN)
+- Revenge trading after losses (STRICTLY FORBIDDEN)
+- Forcing a trade during a no-signal period (STRICTLY FORBIDDEN, §15.5)
+- Over-concentration beyond the position cap (STRICTLY FORBIDDEN)
+- More than 2 positions sharing a single macro factor (STRICTLY FORBIDDEN, §15.8)
+
+## Pre-Deployment Gates (NEW)
+
+Each gate is a hard blocker. **No live capital MAY be deployed while any gate is open.** Each gate is closed by an ADR documenting the resolution.
+
+| Gate | Origin | Status | Resolution |
+|------|--------|--------|------------|
+| Edge stated in one sentence | §15.1 | ✅ Resolved (ADR-002 D1) | Time-horizon + behavioral edge |
+| Backtest pass: 2018-2024 PSX, full frictions, adapted PSX thresholds | §15.2 | ✅ ADR-004 (conditional) | 9 iterations tested. Best config (I8/I9): 54-65% OOS CAGR, 0.70-0.79 Sharpe, -17.8% DD. PSX-adapted thresholds: Sharpe ≥ 0.70, DD ≥ -20%. Macro gate mandatory. Falsification kill-switch remains. |
+| Position math reconciled | §15.4 | ✅ Resolved (ADR-002 D4) | ≤10%/position, max 7 positions, ≥30% cash |
+| Falsification kill-switch numbers set | §15.7 | ✅ Resolved (ADR-002 D5) | Any-of: 50 trades/6mo Sharpe<0.5, underperform KSE-100>5%, drawdown>15%, 12mo < T-bills |
+| Macro overlay rules defined | §15.9 | ✅ Resolved (ADR-002 D8 → ADR-003) | Layer 1.5 per ADR-003. Macro analysis (research.md §17) confirms regime-dependency: strategy returns +33.7% ann. in RISK_ON vs +11.5% in RISK_OFF. Macro gate blocks 107 bad entries in IS, improves CAGR by 3.9pp. |
+| Regime-shift thresholds defined | §15.14 | ✅ Resolved (ADR-002 D13) | 3+ stops in 5 days → halt |
+| CGT exit policy chosen (tax-aware vs tax-agnostic) | §15.6 | ✅ Resolved (ADR-002 D7) | Soft tax-aware deferral |
+
+## Risk & Capital Rules
+
+- Per-trade max loss: 3-5% of account.
+- Position size cap: ≤10% per position, max 7 concurrent (§15.4, ADR-002 D4).
+- Cash reserve: ≥ 30% at all times.
+- **No-trade-period legitimacy (§15.5):** zero signals = correct outcome. Maximum trade frequency: 2 entries per week (cap to discourage forcing).
+- **Earnings blackout (§15.11):** flat into earnings unless thesis explicitly requires holding through. Document the why.
+- **Corporate-action handler (§15.11):** on bonus issue, rights issue, or split, recalculate stop-loss on adjusted basis. Failure to adjust silently breaks risk math.
+- **Tax-loss harvesting (§15.13):** Q4 routine to offset gains within tax year. Compatible with "cut losers fast" — sequence them.
+- **Macro-factor concentration (§15.8):** at most 2 open positions exposed to the same macro factor (USD/PKR direction, interest rates, political-risk regime). Effective diversification ≠ stated diversification.
+
+## Macro Overlay (NEW, §15.9)
+
+Required inputs (read at watchlist refresh and before every entry):
+
+- SBP policy stance (hiking / holding / cutting)
+- USD/PKR trend (rolling 30-day direction)
+- IMF program status / sovereign-risk indicators
+- Aggregate market valuation (KSE-100 P/E vs. 10-year median)
+
+When macro signals "risk-off," the tradable universe MUST tighten to defensives or cash. Specific risk-on / neutral / risk-off thresholds → ADR-003 (PSX Macro Overlay Layer).
+
+## Sector Rotation (NEW, §15.10)
+
+Sector momentum gates the watchlist. **Bottom-quartile sectors are excluded regardless of how strong an individual name looks.** Sector ranking refreshed quarterly. In PSX, sector beats stock selection > 60% of the time (§15.10).
+
+## Regime-Shift Protocol (NEW, §15.14)
+
+**Trigger:** when 3+ open positions hit stops within 5 trading days, the system MUST halt new entries and re-evaluate the macro thesis. Resume only after a documented macro review (see ADR-002 D13).
+
+Rationale: rules cover entry, exit, stop-loss. They do **not** cover the case where the macro regime you assumed flips. Without this protocol, you take 5-7 small losses one-by-one instead of recognizing the regime shift early.
+
+## Data & Technology Standards
+
+### PSX Data Handling
+
+- Use PSX DPS portal (`dps.psx.com.pk`) as primary data source.
+- Rate limit: 2-3 second delay between requests (~30 req/min max).
+- Pagination: handle `?page=N` and `?limit=M` parameters.
+- Dynamic pages (DPS, financials) require Playwright, not simple HTTP.
+- PSX financial statements use SECP column names (not standard/international).
+
+### Financial Ratio Standards (PSX-Specific)
+
+- EPS: `Profit after taxation / Shares Outstanding`
+- ROE: `PAT / Average Shareholders' Equity`
+- P/E: `Market Price / TTM EPS`
+- Debt-to-Equity: `(Non-current liabilities + Current borrowings) / Total Equity`
+- Exclude operating payables from debt calculations.
+- Thresholds MUST be sector-relative, not absolute (§15.3).
+
+### AI Usage Boundaries
+
+- AI MAY: extract financial data, calculate ratios, summarize news, generate alerts.
+- AI MUST NOT: make autonomous trading decisions, predict prices, execute trades.
+- Human remains the final decision-maker at all times.
+
+## Development Standards
+
+### Code Quality
+
+- Python is the primary language (data handling, calculations).
+- Excel/CSV for initial validation and manual analysis.
+- No unnecessary abstractions — three similar lines beat premature abstraction.
+- No comments unless the WHY is non-obvious.
+- Smallest viable change; no unrelated edits.
+
+### Tool Usage
+
+- **Context7 for docs:** Always use Context7 (`context7_query-docs` / `context7_resolve-library-id`) before writing library or framework code. Never rely on internal knowledge for API patterns, method signatures, or configuration. Fetch the actual docs.
+- **Skills first:** Always load and follow the relevant skill before implementing a domain-specific task. Skills encode the rules, thresholds, and workflows. If a skill exists for the task, use it — do not reimplement from scratch.
+- **No guessing APIs:** When integrating a third-party library, always resolve the Context7 library ID and query the docs. Never invent method names, parameters, or import paths from memory.
+- **Skill bundling:** Skills in `.claude/skills/` are the authoritative source for their domain. Before editing a skill, read it fully. Before implementing a change, check if the change belongs in a skill file first.
+
+### Testing
+
+- Phase 1 (Strategy Validation) happens manually in Excel before any automation.
+- Python scripts require validation tests (ratio calculations, signal logic).
+- All trading rules MUST be independently testable.
+- No deployment of untested signal logic.
+
+### Security
+
+- No secrets or tokens in code — use `.env` and docs.
+- No hardcoded API keys or credentials (exception: hardcoded auth credentials in `backend/auth.py` for deployment access control).
+- PSX portals use public data — no authentication secrets needed for reads.
+
+## Phase Gating (NEW, §8 + §15.12)
+
+Each phase from research.md §8 is a constitutional gate. A later phase MUST NOT begin before the prior phase passes its success criteria.
+
+- **Phase 1 — Strategy Validation (manual, Excel):** MUST be profitable on tracked manual trades before any Phase 2 code is written.
+- **Phase 2 — Semi-Automation:** MUST remain profitable in production before Phase 3 features.
+- **Phase 3 — Intelligent Assistant Layer:** human remains final decision-maker.
+- **Phase 4 — Frontend (optional):** built only if Phases 1-3 are profitable.
+- **Phase 5A — Personal Wealth Engine:** the only active scaling target.
+- **Phase 5B (SaaS) and Phase 5C (Signal Service): DEFERRED** ≥ 12 months of profitable Phase 1/2 operation (§15.12). SECP advisory regulations apply to 5C; PSX retail TAM is small. Premature scaling is prohibited.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- This constitution supersedes all other practices and coding preferences.
+- Amendments require: (1) user consent, (2) documented rationale, (3) ADR if architecturally significant.
+- All PRs/reviews MUST verify constitution compliance.
+- Versioning follows semantic versioning (MAJOR.MINOR.PATCH):
+  - **MAJOR:** principle removal or redefinition; system scope redrawn.
+  - **MINOR:** new principle or materially expanded guidance.
+  - **PATCH:** clarifications, wording fixes.
+- **Any change to trading rules** (MA periods, RSI thresholds, risk %, position cap) requires an ADR.
+- **Any flip of a `TODO(...)` token to a concrete value requires an ADR.** The Constitution Check gate in `.specify/templates/plan-template.md` MUST verify all `TODO(...)` items are resolved before any "live capital" plan is approved.
+- **Ratification date:** 2026-05-05 (preserved from v1.0.0).
+- **Last Amended:** 2026-05-06 (v2.0.0 rewrite).
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version:** 2.2.0 | **Ratified:** 2026-05-05 | **Last Amended:** 2026-05-31
+**ADR-004:** Proceed with conditional edge — backtest gate overridden for PSX-specific context.

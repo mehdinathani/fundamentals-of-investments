@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-900: #0a0e1a;
+  --color-navy-800: #0f1629;
+  --color-navy-700: #151f38;
+  --color-navy-600: #1c2a4a;
+  --color-gold: #f0b90b;
+  --color-gold-dim: #8a6d0e;
+  --color-green: #0ecb81;
+  --color-red: #f6465d;
+  --color-surface: #1e2329;
+  --color-surface-light: #2b3139;
+  --color-text-dim: #848e9c;
+}
+
+body {
+  background-color: #0a0e1a;
+  color: #eaecef;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(240, 185, 11, 0.2); }
+  50% { box-shadow: 0 0 12px rgba(240, 185, 11, 0.4); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

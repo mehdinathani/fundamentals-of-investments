@@ -1,0 +1,51 @@
+{
+  "FERTILIZER": {
+    "symbols_in_sector": 5,
+    "PE_median": 9.85,
+    "PE_count": 4,
+    "EPS_median": 28.5,
+    "EPS_count": 4
+  },
+  "CEMENT": {
+    "symbols_in_sector": 9,
+    "PE_median": 11.2,
+    "PE_count": 7,
+    "EPS_median": 22.3,
+    "EPS_count": 7
+  },
+  "OIL_GAS": {
+    "symbols_in_sector": 11,
+    "PE_median": 7.5,
+    "PE_count": 9,
+    "EPS_median": 35.8,
+    "EPS_count": 9
+  },
+  "COMMERCIAL_BANKS": {
+    "symbols_in_sector": 12,
+    "PE_median": 8.3,
+    "PE_count": 10,
+    "EPS_median": 18.2,
+    "EPS_count": 10
+  },
+  "TECHNOLOGY": {
+    "symbols_in_sector": 5,
+    "PE_median": 14.5,
+    "PE_count": 4,
+    "EPS_median": 12.1,
+    "EPS_count": 4
+  },
+  "POWER": {
+    "symbols_in_sector": 6,
+    "PE_median": 6.8,
+    "PE_count": 5,
+    "EPS_median": 15.4,
+    "EPS_count": 5
+  },
+  "PHARMA": {
+    "symbols_in_sector": 6,
+    "PE_median": 18.3,
+    "PE_count": 5,
+    "EPS_median": 22.7,
+    "EPS_count": 5
+  }
+}

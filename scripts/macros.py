@@ -1,0 +1,116 @@
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
+BENCHMARKS_DIR = DATA_DIR / "benchmarks"
+RUNS_DIR = DATA_DIR / "runs"
+HISTORICAL_DIR = DATA_DIR / "historical"
+SCRIPTS_DIR = PROJECT_ROOT / "scripts"
+
+KSE30_PATH = BENCHMARKS_DIR / "kse30_ratios_latest.csv"
+KSE100_PATH = BENCHMARKS_DIR / "kse100_ratios_latest.csv"
+ALLSHR_PATH = BENCHMARKS_DIR / "allshr_ratios_latest.csv"
+
+STALE_DATA_DAYS = 30
+
+VALIDATION_SYMBOLS = ["ENGRO", "OGDC", "HBL", "LUCK", "SYS"]
+
+DPS_BASE_URL = "https://dps.psx.com.pk"
+DPS_HISTORICAL_URL = f"{DPS_BASE_URL}/historical"
+DPS_COMPANY_URL = f"{DPS_BASE_URL}/company"
+DPS_FINANCIALS_URL = f"{DPS_BASE_URL}/financials"
+DPS_HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"}
+
+DPS_DELAY_MIN = 2.5
+DPS_DELAY_MAX = 4.0
+DPS_RETRIES = 3
+DPS_TIMEOUT = 30
+
+SECTORS = [
+    "COMMERCIAL_BANKS",
+    "CEMENT",
+    "FERTILIZER",
+    "OIL_GAS",
+    "POWER",
+    "PHARMA",
+    "TECHNOLOGY",
+    "FOOD",
+    "TEXTILE",
+    "AUTO",
+    "CHEMICAL",
+    "ENGINEERING",
+    "INSURANCE",
+    "INV_BANKS",
+    "LEASING",
+    "MODARABAS",
+    "PAPER_BOARD",
+    "PROPERTY",
+    "SUGAR",
+    "TOBACCO",
+    "TRANSPORT",
+    "VANASBATI",
+]
+
+SECTOR_CODES = {
+    "COMMERCIAL_BANKS": ["HBL", "UBL", "MCB", "NBP", "BAHL", "BAFL", "FABL", "SCBPL", "HMB", "SNBL", "BIPL", "MEBL"],
+    "CEMENT": ["LUCK", "DGKC", "FCCL", "PIOC", "ACPL", "CHCC", "KOHC", "MLCF", "POWER"],
+    "FERTILIZER": ["ENGRO", "EFERT", "FFBL", "FFCL", "LOTCHEM"],
+    "OIL_GAS": ["OGDC", "PPL", "POL", "MARI", "SHEL", "PSO", "APL", "HASCOL", "NRL", "PRL", "ATRL"],
+    "POWER": ["HUBC", "KAPCO", "KEL", "NCPL", "CPHL", "ALTN"],
+    "PHARMA": ["ABOT", "SEARL", "GLAXO", "AGP", "HINOON", "BIFO"],
+    "TECHNOLOGY": ["SYS", "TRIG", "AVN", "NETSOL", "PACE"],
+    "FOOD": ["NESTLE", "NML", "COLG", "MUREEB", "RUBY"],
+    "TEXTILE": ["GATI", "NCL", "KTC", "INDUS", "TREET"],
+    "AUTO": ["INDU", "HCAR", "PSMC", "SAZEW", "GHNI", "AGHA"],
+    "CHEMICAL": ["ICI", "EPCL", "LYXP", "SITC", "DYN", "POLY", "NICL"],
+    "ENGINEERING": ["ASTL", "MUGHAL", "INTERNL", "CSAP", "TGL", "BRR"],
+    "INSURANCE": ["AICL", "THEM", "EFULL", "PAKRI", "SINSC"],
+    "INV_BANKS": ["JAKCAM", "PECO"],
+    "MODARABAS": [],
+    "PAPER_BOARD": ["PKGS", "CENTURY", "PECO"],
+    "PROPERTY": [],
+    "SUGAR": ["RBS", "KOSM", "DWSB", "CHAS", "BGL", "FATIMA"],
+    "TOBACCO": ["PAKT"],
+    "TRANSPORT": ["PNSC", "PIBTL", "FLYNS"],
+    "VANASBATI": [],
+}
+
+MA_PERIODS = {"fast": 20, "medium": 50, "slow": 200}
+RSI_PERIOD = 14
+VOLUME_CONFIRMATION_RATIO = 1.2
+
+RSI_OVERSOLD = 30
+RSI_OVERBOUGHT = 70
+
+LIQUIDITY_MIN_DAILY_VALUE_PKR = 5_000_000
+LIQUIDITY_MIN_DAILY_VOLUME = 50_000
+LIQUIDITY_MIN_FREEFLOAT_PCT = 25.0
+LIQUIDITY_MIN_TRADED_DAYS = 25
+
+SPREAD_MAX_PCT = 2.0
+
+OPERATOR_PRICE_MOVE_PCT = 5.0
+OPERATOR_VOLUME_RATIO = 1.0
+
+VOLUME_SPIKE_CAUTION = 3.0
+VOLUME_SPIKE_REJECT = 5.0
+
+CIRCUIT_BREAKER_WINDOW = 5
+CIRCUIT_BREAKER_HITS = 2
+
+RISK_MAX_LOSS_PCT = 5.0
+RISK_CONSERVATIVE_LOSS_PCT = 3.0
+
+INDEX_KSE30 = "KSE30"
+INDEX_KSE100 = "KSE100"
+INDEX_ALLSHR = "ALLSHR"
+
+RATIO_FIELDS = ["ROE", "PE", "DE", "EPS", "DIVIDEND_YIELD"]
+
+RATIO_DESCRIPTIONS = {
+    "ROE": "Return on Equity (%)",
+    "PE": "Price-to-Earnings (x)",
+    "DE": "Debt-to-Equity (x)",
+    "EPS": "Earnings Per Share (PKR)",
+    "DIVIDEND_YIELD": "Dividend Yield (%)",
+}

@@ -1,0 +1,24 @@
+{
+  "iteration": 8,
+  "description": "Regime-aware configs + ADX > 25 + volume > 150% + tighter trailing (8%/10%) + partial profit + cool-off",
+  "is": {
+    "cagr": 0.06360177721112059,
+    "sharpe": -0.3517750381926867,
+    "max_dd": -12.418922622500943,
+    "win_rate": 0.5,
+    "wl_ratio": 1.6595220428933968,
+    "trades": 34,
+    "verdict": "FAIL"
+  },
+  "oos": {
+    "cagr": 0.5440100762685407,
+    "sharpe": 0.7033378653877973,
+    "max_dd": -17.831749902105877,
+    "win_rate": 0.6086956521739131,
+    "wl_ratio": 2.0165861194703503,
+    "trades": 23,
+    "verdict": "FAIL"
+  },
+  "risk_off_blocked_is": 7,
+  "risk_off_blocked_oos": 0
+}

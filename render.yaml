@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: psx-invest-api
+    runtime: python
+    repo: https://github.com/mehdinathani/fundamentals-of-investments
+    plan: free
+    branch: feature/psx-skills-architecture
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: AUTH_USER
+        value: admin
+      - key: AUTH_PASS
+        value: psx2026
+      - key: FRONTEND_URL
+        value: https://psx-invest.vercel.app
+      - key: PYTHON_VERSION
+        value: 3.11.0
